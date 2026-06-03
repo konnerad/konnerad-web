@@ -11,14 +11,14 @@ type FormData = {
   label: string
   year: string
   tag: string
-  desc: string
+  description: string
   color: string
   shape: typeof SHAPES[number]
 }
 
 const emptyForm = (): FormData => ({
   label: '', year: new Date().getFullYear().toString(),
-  tag: '', desc: '', color: COLORS[0], shape: 'circle',
+  tag: '', description: '', color: COLORS[0], shape: 'circle',
 })
 
 export default function Dashboard() {
@@ -49,7 +49,7 @@ export default function Dashboard() {
 
   function startEdit(p: Project) {
     setEditing(p.id)
-    setForm({ label: p.label, year: p.year, tag: p.tag, desc: p.desc, color: p.color, shape: p.shape })
+    setForm({ label: p.label, year: p.year, tag: p.tag, description: p.description, color: p.color, shape: p.shape })
     setImages(p.images ?? [])
     setPanel('edit')
   }
@@ -211,8 +211,8 @@ export default function Dashboard() {
                   <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(232,228,220,0.3)' }}>Description</label>
                   <textarea
                     className={inputClass} style={{ ...inputStyle, resize: 'vertical', minHeight: '100px' }}
-                    value={form.desc}
-                    onChange={e => setForm(f => ({ ...f, desc: e.target.value }))}
+                    value={form.description}
+                    onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                     placeholder="Short description of the project"
                   />
                 </div>

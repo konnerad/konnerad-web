@@ -5,7 +5,7 @@ create table if not exists projects (
   label        text not null,
   year         text not null default '',
   tag          text not null default '',
-  desc         text not null default '',
+  description  text not null default '',
   color        text not null default '#7F77DD',
   shape        text not null default 'circle',
   images       text[] not null default '{}',
@@ -13,8 +13,7 @@ create table if not exists projects (
   created_at   timestamptz default now()
 );
 
--- Allow public read access (the portfolio page fetches via service role anyway,
--- but this keeps things tidy if you ever use the anon key directly)
+-- Allow public read access
 alter table projects enable row level security;
 
 create policy "Public read" on projects

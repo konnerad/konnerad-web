@@ -114,7 +114,7 @@ export default function ProjectModal({
         </span>
         <div className="w-8 mb-8" style={{ height: '0.5px', background: 'rgba(232,228,220,0.2)' }} />
         <p className="text-[12.5px] leading-[1.9] mb-12" style={{ color: 'rgba(232,228,220,0.55)', maxWidth: '42ch' }}>
-          {project?.desc}
+          {project?.description}
         </p>
         <div className="mt-auto flex flex-col gap-3.5">
           {[{ label: 'Year', value: project?.year }, { label: 'Type', value: project?.tag }].map(({ label, value }) => (

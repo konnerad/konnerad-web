@@ -5,7 +5,7 @@ export type Project = {
   label: string
   year: string
   tag: string
-  desc: string
+  description: string
   color: string
   shape: 'circle' | 'square' | 'diamond'
   images: string[]
