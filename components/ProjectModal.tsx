@@ -3,6 +3,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Project } from '@/lib/supabase'
 
+function isVideo(url: string) {
+  return /\.(mp4|mov|webm|m4v|avi)(\?|$)/i.test(url)
+}
+
 function shiftColor(hex: string, amount: number) {
   const n = parseInt(hex.replace('#', ''), 16)
   const clamp = (v: number) => Math.max(0, Math.min(255, v))
@@ -131,14 +135,24 @@ export default function ProjectModal({
       {/* Gallery side */}
       <div className="relative flex items-center justify-center overflow-hidden" style={{ background: '#060609' }}>
         {images.length > 0 ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            key={imgIndex}
-            src={images[imgIndex]}
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ animation: 'fadeIn 0.45s ease' }}
-          />
+          isVideo(images[imgIndex]) ? (
+            <video
+              key={imgIndex}
+              src={images[imgIndex]}
+              controls
+              className="max-w-full max-h-full"
+              style={{ animation: 'fadeIn 0.45s ease' }}
+            />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={imgIndex}
+              src={images[imgIndex]}
+              alt=""
+              className="max-w-full max-h-full object-contain"
+              style={{ animation: 'fadeIn 0.45s ease' }}
+            />
+          )
         ) : (
           <Placeholder color={project?.color ?? '#444'} seed={imgIndex} />
         )}

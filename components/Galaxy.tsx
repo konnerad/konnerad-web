@@ -24,7 +24,7 @@ function buildOrbits(projects: Project[]): Orb[] {
     const posInRing = i % PER_RING
     const segmentSize = (Math.PI * 2) / PER_RING
     const phase = posInRing * segmentSize + Math.random() * segmentSize * 0.75
-    const sizeFraction = (26 + Math.random() * 16) / 248
+    const sizeFraction = (32 + Math.random() * 16) / 248
     return { ...p, radiusFraction, speed, phase, sizeFraction }
   })
 }
@@ -37,6 +37,8 @@ export default function Galaxy({
   onSelect: (project: Project, screenX: number, screenY: number) => void
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  // Map from URL → loaded HTMLImageElement (null while loading)
+  const imgCache = useRef<Map<string, HTMLImageElement | null>>(new Map())
   const stateRef = useRef({
     orbits: [] as Orb[],
     W: 0, H: 0, cx: 0, cy: 0,
@@ -94,30 +96,71 @@ export default function Galaxy({
       ctx.restore()
     }
 
-    function drawShape(
-      shape: string, x: number, y: number, size: number,
-      color: string, alpha: number, glowAlpha: number
+    // Returns the cached image if ready, kicks off load if not
+    function getImg(url: string): HTMLImageElement | null {
+      if (imgCache.current.has(url)) return imgCache.current.get(url) ?? null
+      imgCache.current.set(url, null) // mark loading
+      const img = new Image()
+      img.crossOrigin = 'anonymous'
+      img.onload = () => imgCache.current.set(url, img)
+      img.onerror = () => imgCache.current.delete(url)
+      img.src = url
+      return null
+    }
+
+    function drawOrb(
+      orb: Orb, x: number, y: number, size: number, alpha: number, isHov: boolean
     ) {
+      const r = size / 2
+      const coverUrl = orb.images?.[0]
+      const img = coverUrl ? getImg(coverUrl) : null
+
       ctx.save()
       ctx.globalAlpha = Math.min(1, alpha)
-      ctx.shadowColor = color
-      ctx.shadowBlur = 18 * glowAlpha
-      ctx.fillStyle = color
-      ctx.strokeStyle = 'rgba(255,255,255,0.15)'
-      ctx.lineWidth = 0.5
-      ctx.beginPath()
-      if (shape === 'circle') {
-        ctx.arc(x, y, size / 2, 0, Math.PI * 2)
-      } else if (shape === 'square') {
-        const sq = size * 0.85
-        ctx.rect(x - sq / 2, y - sq / 2, sq, sq)
+
+      if (img && img.naturalWidth > 0) {
+        // Circular image
+        ctx.shadowColor = 'rgba(255,255,255,0.25)'
+        ctx.shadowBlur = isHov ? 22 : 10
+        ctx.beginPath()
+        ctx.arc(x, y, r, 0, Math.PI * 2)
+        ctx.clip()
+        // cover-fit: scale to fill circle
+        const aspect = img.naturalWidth / img.naturalHeight
+        let sw = size, sh = size
+        if (aspect > 1) { sw = size * aspect } else { sh = size / aspect }
+        ctx.drawImage(img, x - sw / 2, y - sh / 2, sw, sh)
       } else {
-        const d = size * 0.6
-        ctx.moveTo(x, y - d); ctx.lineTo(x + d, y)
-        ctx.lineTo(x, y + d); ctx.lineTo(x - d, y)
-        ctx.closePath()
+        // Fallback: coloured shape while image loads (or no image)
+        ctx.shadowColor = orb.color
+        ctx.shadowBlur = 18 * (isHov ? 1 : 0.4)
+        ctx.fillStyle = orb.color
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)'
+        ctx.lineWidth = 0.5
+        ctx.beginPath()
+        if (orb.shape === 'circle') {
+          ctx.arc(x, y, r, 0, Math.PI * 2)
+        } else if (orb.shape === 'square') {
+          const sq = size * 0.85
+          ctx.rect(x - sq / 2, y - sq / 2, sq, sq)
+        } else {
+          const d = size * 0.6
+          ctx.moveTo(x, y - d); ctx.lineTo(x + d, y)
+          ctx.lineTo(x, y + d); ctx.lineTo(x - d, y)
+          ctx.closePath()
+        }
+        ctx.fill()
+        ctx.stroke()
       }
-      ctx.fill()
+      ctx.restore()
+
+      // Thin border ring on top
+      ctx.save()
+      ctx.globalAlpha = Math.min(1, alpha) * (isHov ? 0.8 : 0.35)
+      ctx.beginPath()
+      ctx.arc(x, y, r, 0, Math.PI * 2)
+      ctx.strokeStyle = isHov ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.25)'
+      ctx.lineWidth = isHov ? 1.5 : 0.5
       ctx.stroke()
       ctx.restore()
     }
@@ -128,7 +171,7 @@ export default function Galaxy({
 
       ORBIT_FRACTIONS.forEach(f => drawRing(f * s.baseRadius))
 
-      // center dot
+      // Centre dot
       ctx.save()
       ctx.shadowColor = 'rgba(255,255,255,0.8)'
       ctx.shadowBlur = 30
@@ -157,7 +200,7 @@ export default function Galaxy({
         const scale = Math.max(0.18, 0.65 + d * 0.55) + (isHov ? 0.12 : 0)
         const size = baseSize * scale
 
-        drawShape(orb.shape, pos.x, pos.y, size, orb.color, alpha + 0.2, isHov ? 1 : 0.4)
+        drawOrb(orb, pos.x, pos.y, size, alpha, isHov)
 
         if (isHov) {
           ctx.save()
@@ -185,15 +228,11 @@ export default function Galaxy({
       canvas.style.cursor = s.hovered !== -1 ? 'pointer' : 'default'
     }
 
-    const onClick = (e: MouseEvent) => {
+    const onClick = () => {
       if (s.hovered === -1) return
       const rect = canvas.getBoundingClientRect()
       const pos = s.lastPositions[s.hovered]
-      onSelect(
-        s.orbits[s.hovered],
-        rect.left + pos.x,
-        rect.top + pos.y,
-      )
+      onSelect(s.orbits[s.hovered], rect.left + pos.x, rect.top + pos.y)
     }
 
     const onResize = () => resize()

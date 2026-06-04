@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
     .from('project-images')
     .upload(path, file, { contentType: file.type, upsert: false })
 
+
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   const { data: { publicUrl } } = supabase.storage

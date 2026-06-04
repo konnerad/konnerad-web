@@ -255,18 +255,18 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Right: images */}
-              <div>
-                <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(232,228,220,0.3)' }}>Images</label>
+              {/* Right: images & videos */}
+              <div className="flex flex-col min-h-0">
+                <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(232,228,220,0.3)' }}>Images &amp; Videos</label>
                 <div
-                  className="p-4 rounded-sm mb-3 text-center cursor-pointer transition-colors"
+                  className="p-4 rounded-sm mb-3 text-center cursor-pointer transition-colors shrink-0"
                   style={{ border: '1px dashed rgba(232,228,220,0.15)', background: 'rgba(232,228,220,0.02)' }}
                   onClick={() => fileRef.current?.click()}
                 >
                   <input
                     ref={fileRef}
                     type="file"
-                    accept="image/*"
+                    accept="image/*,video/*"
                     multiple
                     className="hidden"
                     onChange={e => {
@@ -275,29 +275,37 @@ export default function Dashboard() {
                     }}
                   />
                   <p className="text-[11px]" style={{ color: uploading ? 'rgba(232,228,220,0.6)' : 'rgba(232,228,220,0.25)' }}>
-                    {uploading ? 'Uploading…' : '+ Click to upload images'}
+                    {uploading ? 'Uploading…' : '+ Click to upload images or videos'}
                   </p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
-                  {images.map((url, i) => (
-                    <div key={url} className="relative group rounded-sm overflow-hidden aspect-square">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={url} alt="" className="w-full h-full object-cover" />
-                      <button
-                        onClick={() => setImages(prev => prev.filter((_, j) => j !== i))}
-                        className="absolute top-1 right-1 w-6 h-6 flex items-center justify-center rounded-full text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"
-                        style={{ background: 'rgba(10,10,15,0.8)', color: '#e8e4dc' }}
-                      >
-                        ×
-                      </button>
-                      {i === 0 && (
-                        <span className="absolute bottom-1 left-1 text-[8px] tracking-wider px-1.5 py-0.5 rounded-sm" style={{ background: 'rgba(10,10,15,0.7)', color: 'rgba(232,228,220,0.6)' }}>
-                          Cover
-                        </span>
-                      )}
-                    </div>
-                  ))}
+                {/* Scrollable media grid */}
+                <div className="overflow-y-auto" style={{ maxHeight: '340px' }}>
+                  <div className="grid grid-cols-2 gap-2">
+                    {images.map((url, i) => {
+                      const video = /\.(mp4|mov|webm|m4v|avi)(\?|$)/i.test(url)
+                      return (
+                        <div key={url} className="relative group rounded-sm overflow-hidden aspect-square bg-black">
+                          {video ? (
+                            <video src={url} className="w-full h-full object-contain" muted />
+                          ) : (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={url} alt="" className="w-full h-full object-cover" />
+                          )}
+                          <button
+                            onClick={() => setImages(prev => prev.filter((_, j) => j !== i))}
+                            className="absolute top-1 right-1 w-6 h-6 flex items-center justify-center rounded-full text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"
+                            style={{ background: 'rgba(10,10,15,0.8)', color: '#e8e4dc' }}
+                          >
+                            ×
+                          </button>
+                          <span className="absolute bottom-1 left-1 text-[8px] tracking-wider px-1.5 py-0.5 rounded-sm" style={{ background: 'rgba(10,10,15,0.7)', color: 'rgba(232,228,220,0.6)' }}>
+                            {i === 0 ? 'Cover' : video ? 'Video' : `${i + 1}`}
+                          </span>
+                        </div>
+                      )
+                    })}
+                  </div>
                 </div>
               </div>
             </div>
