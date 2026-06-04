@@ -120,45 +120,51 @@ export default function ProjectModal({
       </div>
 
       {/* ── Mobile ── */}
-      <div className="flex flex-col md:hidden" style={{ paddingTop: '64px', paddingBottom: '64px' }}>
+      <div className="flex flex-col md:hidden" style={{ paddingTop: '72px', paddingBottom: '72px' }}>
+
         {/* Name + ref */}
-        <div className="px-6 pb-5">
-          <p className="text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(232,228,220,0.3)' }}>
+        <div style={{ padding: '0 24px 24px' }}>
+          <p className="text-[9px] tracking-[0.2em] uppercase mb-3" style={{ color: 'rgba(232,228,220,0.3)' }}>
             {refNum}
           </p>
           <h2
             className="font-light leading-[1.2]"
-            style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '22px', color: '#e8e4dc' }}
+            style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '24px', color: '#e8e4dc' }}
           >
             {project?.label}
           </h2>
         </div>
 
-        {/* Gallery */}
-        <div className="relative w-full" style={{ aspectRatio: '4/3', background: '#060609' }}>
-          <GalleryMedia images={images} imgIndex={imgIndex} setImgIndex={setImgIndex} imgCount={imgCount} project={project} />
+        {/* Gallery — full width but with side margins */}
+        <div style={{ margin: '0 24px' }}>
+          <div className="relative w-full overflow-hidden" style={{ aspectRatio: '4/3', background: '#060609', borderRadius: '2px' }}>
+            <GalleryMedia images={images} imgIndex={imgIndex} setImgIndex={setImgIndex} imgCount={imgCount} project={project} />
+          </div>
         </div>
 
         {/* Meta rows */}
-        <div className="mx-6 mt-6 flex flex-col" style={{ borderTop: '0.5px solid rgba(232,228,220,0.1)' }}>
+        <div style={{ margin: '32px 24px 0', borderTop: '0.5px solid rgba(232,228,220,0.12)' }}>
           {metaRows.map(({ label, value }) => (
             <div
               key={label}
-              className="flex justify-between items-baseline py-4"
-              style={{ borderBottom: '0.5px solid rgba(232,228,220,0.1)' }}
+              className="flex justify-between items-baseline"
+              style={{ padding: '14px 0', borderBottom: '0.5px solid rgba(232,228,220,0.12)' }}
             >
-              <span className="text-[9px] tracking-[0.16em] uppercase" style={{ color: 'rgba(232,228,220,0.3)' }}>
+              <span className="text-[9px] tracking-[0.18em] uppercase" style={{ color: 'rgba(232,228,220,0.3)' }}>
                 {label}
               </span>
-              <span className="text-[12px]" style={{ color: 'rgba(232,228,220,0.65)' }}>{value}</span>
+              <span className="text-[12px]" style={{ color: 'rgba(232,228,220,0.65)', fontFamily: "'DM Mono', monospace" }}>
+                {value}
+              </span>
             </div>
           ))}
         </div>
 
         {/* Description */}
-        <p className="px-6 mt-8 text-[13px] leading-[1.85]" style={{ color: 'rgba(232,228,220,0.5)' }}>
+        <p style={{ margin: '32px 24px 0', fontSize: '13px', lineHeight: '1.9', color: 'rgba(232,228,220,0.5)' }}>
           {project?.description}
         </p>
+
       </div>
     </div>
   )
