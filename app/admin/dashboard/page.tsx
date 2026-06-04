@@ -11,6 +11,7 @@ type FormData = {
   label: string
   year: string
   tag: string
+  client: string
   description: string
   color: string
   shape: typeof SHAPES[number]
@@ -18,7 +19,7 @@ type FormData = {
 
 const emptyForm = (): FormData => ({
   label: '', year: new Date().getFullYear().toString(),
-  tag: '', description: '', color: COLORS[0], shape: 'circle',
+  tag: '', client: '', description: '', color: COLORS[0], shape: 'circle',
 })
 
 export default function Dashboard() {
@@ -53,7 +54,7 @@ export default function Dashboard() {
 
   function startEdit(p: Project) {
     setEditing(p.id)
-    setForm({ label: p.label, year: p.year, tag: p.tag, description: p.description, color: p.color, shape: p.shape })
+    setForm({ label: p.label, year: p.year, tag: p.tag, client: p.client ?? '', description: p.description, color: p.color, shape: p.shape })
     setImages(p.images ?? [])
     setThumbnail(p.thumbnail ?? '')
     setPanel('edit')
@@ -219,9 +220,13 @@ export default function Dashboard() {
                     <input className={inputClass} style={inputStyle} value={form.year} onChange={e => setForm(f => ({ ...f, year: e.target.value }))} />
                   </div>
                   <div>
-                    <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(232,228,220,0.3)' }}>Tag</label>
+                    <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(232,228,220,0.3)' }}>Type / Tag</label>
                     <input className={inputClass} style={inputStyle} value={form.tag} onChange={e => setForm(f => ({ ...f, tag: e.target.value }))} placeholder="e.g. Branding" />
                   </div>
+                </div>
+                <div>
+                  <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(232,228,220,0.3)' }}>Client</label>
+                  <input className={inputClass} style={inputStyle} value={form.client} onChange={e => setForm(f => ({ ...f, client: e.target.value }))} placeholder="Client name" />
                 </div>
                 <div>
                   <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(232,228,220,0.3)' }}>Description</label>

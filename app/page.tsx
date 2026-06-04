@@ -22,18 +22,31 @@ export default function Home() {
       .catch(console.error)
   }, [])
 
+  // Compute ref number for a project based on its position in the array
+  const getRefNum = useCallback((project: Project) => {
+    const idx = projects.findIndex(p => p.id === project.id)
+    return `P${String(idx + 1).padStart(3, '0')}`
+  }, [projects])
+
   const openProject = useCallback((project: Project, screenX: number, screenY: number) => {
+    const refNum = projects.findIndex(p => p.id === project.id)
     setZoom({
       color: project.color,
       x: screenX,
       y: screenY,
       dir: 'in',
       onDone: () => {
-        setModal({ open: true, project, originX: screenX, originY: screenY })
+        setModal({
+          open: true,
+          project,
+          refNum: `P${String(refNum + 1).padStart(3, '0')}`,
+          originX: screenX,
+          originY: screenY,
+        })
         setZoom(null)
       },
     })
-  }, [])
+  }, [projects])
 
   const closeProject = useCallback(() => {
     if (!modal.open) return
@@ -76,7 +89,19 @@ export default function Home() {
       >
         <GridView
           projects={projects}
-          onSelect={p => openProject(p, window.innerWidth / 2, window.innerHeight / 2)}
+          onSelect={(p, refNum) => {
+            const idx = projects.findIndex(pr => pr.id === p.id)
+            setZoom({
+              color: p.color,
+              x: window.innerWidth / 2,
+              y: window.innerHeight / 2,
+              dir: 'in',
+              onDone: () => {
+                setModal({ open: true, project: p, refNum, originX: window.innerWidth / 2, originY: window.innerHeight / 2 })
+                setZoom(null)
+              },
+            })
+          }}
         />
       </div>
 

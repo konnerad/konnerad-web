@@ -7,69 +7,91 @@ export default function GridView({
   onSelect,
 }: {
   projects: Project[]
-  onSelect: (project: Project) => void
+  onSelect: (project: Project, refNum: string) => void
 }) {
   return (
-    <div
-      className="absolute inset-0 overflow-y-auto overflow-x-hidden"
-      style={{ padding: '60px 16px 80px' }}
-    >
+    <div className="absolute inset-0 overflow-y-auto" style={{ padding: '52px 0 80px' }}>
+      {/* Column headers */}
       <div
-        className="grid gap-[10px]"
+        className="grid"
         style={{
           gridTemplateColumns: 'repeat(3, 1fr)',
-          gridAutoRows: 'calc((100vw - 32px - 20px) / 3)',
+          borderBottom: '0.5px solid rgba(232,228,220,0.12)',
         }}
       >
-        {projects.map((p, i) => (
-          <GridItem
-            key={p.id}
-            project={p}
-            index={i}
-            onSelect={onSelect}
-          />
+        {['Project', 'Year / Type'].map((h, i) => (
+          <div
+            key={h}
+            className="px-5 pb-2 text-[9px] tracking-[0.2em] uppercase"
+            style={{
+              color: 'rgba(232,228,220,0.2)',
+              gridColumn: i === 0 ? '1' : '2 / 4',
+            }}
+          >
+            {h}
+          </div>
         ))}
       </div>
-    </div>
-  )
-}
 
-function GridItem({
-  project,
-  index,
-  onSelect,
-}: {
-  project: Project
-  index: number
-  onSelect: (p: Project) => void
-}) {
-  const img = project.images?.[0]
+      {/* Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
+        {projects.map((p, i) => {
+          const refNum = `P${String(i + 1).padStart(3, '0')}`
+          const img = p.thumbnail || p.images?.[0]
+          return (
+            <button
+              key={p.id}
+              onClick={() => onSelect(p, refNum)}
+              className="text-left group flex flex-col"
+              style={{
+                borderRight: (i + 1) % 3 !== 0 ? '0.5px solid rgba(232,228,220,0.1)' : 'none',
+                borderBottom: '0.5px solid rgba(232,228,220,0.1)',
+              }}
+            >
+              {/* Image */}
+              <div className="w-full overflow-hidden" style={{ aspectRatio: '1', background: '#0d0d14' }}>
+                {img ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={img}
+                    alt={p.label}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="w-full h-full" style={{ background: p.color, opacity: 0.4 }} />
+                )}
+              </div>
 
-  return (
-    <button
-      onClick={() => onSelect(project)}
-      className="relative overflow-hidden rounded-sm cursor-pointer group"
-      style={{ transitionDelay: `${index * 40}ms` }}
-    >
-      {img ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={img}
-          alt={project.label}
-          className="w-full h-full object-cover block"
-        />
-      ) : (
-        <div className="w-full h-full" style={{ background: project.color }} />
-      )}
-      <div
-        className="absolute inset-x-0 bottom-0 pt-8 pb-2 px-2.5"
-        style={{ background: 'linear-gradient(transparent, rgba(10,10,15,0.9))' }}
-      >
-        <p className="text-[10px] tracking-widest uppercase text-[rgba(232,228,220,0.9)]">
-          {project.label}
-        </p>
-        <p className="text-[9px] text-[rgba(232,228,220,0.4)] mt-0.5">{project.year}</p>
+              {/* Text */}
+              <div className="px-5 py-4 flex flex-col gap-1.5">
+                <div className="flex items-start justify-between gap-2">
+                  <span
+                    className="leading-tight"
+                    style={{
+                      fontFamily: "'Cormorant Garamond', serif",
+                      fontSize: 'clamp(13px, 1.3vw, 18px)',
+                      color: 'rgba(232,228,220,0.85)',
+                    }}
+                  >
+                    {p.label}
+                  </span>
+                  <span className="text-[8px] tracking-[0.15em] shrink-0 mt-0.5" style={{ color: 'rgba(232,228,220,0.22)' }}>
+                    {refNum}
+                  </span>
+                </div>
+                <div className="flex gap-2 flex-wrap">
+                  <span className="text-[9px] tracking-wider" style={{ color: 'rgba(232,228,220,0.3)' }}>{p.year}</span>
+                  {p.tag && (
+                    <span className="text-[9px] tracking-wider" style={{ color: 'rgba(232,228,220,0.2)' }}>
+                      · {p.tag}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </button>
+          )
+        })}
       </div>
-    </button>
+    </div>
   )
 }

@@ -171,16 +171,6 @@ export default function Galaxy({
 
       ORBIT_FRACTIONS.forEach(f => drawRing(f * s.baseRadius))
 
-      // Centre dot
-      ctx.save()
-      ctx.shadowColor = 'rgba(255,255,255,0.8)'
-      ctx.shadowBlur = 30
-      ctx.fillStyle = 'rgba(255,255,255,0.9)'
-      ctx.beginPath()
-      ctx.arc(s.cx, s.cy, 3, 0, Math.PI * 2)
-      ctx.fill()
-      ctx.restore()
-
       s.hovered = -1
       const positions = s.orbits.map(orb => getPos(orb, timestamp))
       s.lastPositions = positions

@@ -6,6 +6,7 @@ export type Project = {
   year: string
   tag: string
   description: string
+  client: string
   color: string
   shape: 'circle' | 'square' | 'diamond'
   images: string[]
