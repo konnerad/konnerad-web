@@ -127,7 +127,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen" style={{ background: '#0a0a0f', color: '#e8e4dc', fontFamily: "'DM Mono', monospace" }}>
       {/* Header */}
-      <div className="flex items-center justify-between px-8 py-5 border-b" style={{ borderColor: 'rgba(232,228,220,0.08)' }}>
+      <div className="flex items-center justify-between border-b" style={{ borderColor: 'rgba(232,228,220,0.08)', padding: '20px 40px' }}>
         <h1 className="text-[11px] tracking-[0.2em] uppercase" style={{ color: 'rgba(232,228,220,0.4)' }}>
           konnerad.com / admin
         </h1>
@@ -141,7 +141,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-8 py-10">
+      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '40px 40px 80px' }}>
         {panel === 'list' ? (
           <>
             <div className="flex items-center justify-between mb-8">

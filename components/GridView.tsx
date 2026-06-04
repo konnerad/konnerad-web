@@ -11,6 +11,7 @@ export default function GridView({
 }) {
   return (
     <div className="absolute inset-0 overflow-y-auto" style={{ paddingTop: '52px', paddingBottom: '80px' }}>
+      <div style={{ maxWidth: '960px', margin: '0 auto', padding: '0 40px' }}>
       <div
         style={{
           display: 'grid',
@@ -94,6 +95,7 @@ export default function GridView({
           )
         })}
       </div>
+      </div> {/* max-width wrapper */}
     </div>
   )
 }

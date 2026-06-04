@@ -28,7 +28,7 @@ export default function AdminLogin() {
 
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: '#0a0a0f' }}>
-      <div className="w-full max-w-sm px-8">
+      <div className="w-full max-w-sm" style={{ padding: '0 32px' }}>
         <h1
           className="text-3xl font-light tracking-widest uppercase mb-10 text-center"
           style={{ fontFamily: "'Cormorant Garamond', serif", color: 'rgba(232,228,220,0.7)' }}

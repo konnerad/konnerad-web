@@ -24,7 +24,7 @@ function buildOrbits(projects: Project[]): Orb[] {
     const posInRing = i % PER_RING
     const segmentSize = (Math.PI * 2) / PER_RING
     const phase = posInRing * segmentSize + Math.random() * segmentSize * 0.75
-    const sizeFraction = (32 + Math.random() * 16) / 248
+    const sizeFraction = (42 + Math.random() * 16) / 248
     return { ...p, radiusFraction, speed, phase, sizeFraction }
   })
 }
@@ -53,9 +53,15 @@ export default function Galaxy({
   const resize = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas) return
+    const ctx = canvas.getContext('2d')!
     const s = stateRef.current
-    s.W = canvas.width = canvas.offsetWidth
-    s.H = canvas.height = canvas.offsetHeight
+    const dpr = window.devicePixelRatio || 1
+    s.W = canvas.offsetWidth
+    s.H = canvas.offsetHeight
+    // Physical pixel dimensions — prevents blurry images on retina/mobile screens
+    canvas.width  = s.W * dpr
+    canvas.height = s.H * dpr
+    ctx.scale(dpr, dpr)
     s.cx = s.W / 2
     s.cy = s.H / 2
     s.baseRadius = Math.min(s.W * 0.46, s.H * 0.82)
@@ -187,7 +193,7 @@ export default function Galaxy({
 
         const d = pos.depth
         const alpha = Math.max(0.12, 0.55 + d * 0.45) + (isHov ? 0.15 : 0)
-        const scale = Math.max(0.18, 0.65 + d * 0.55) + (isHov ? 0.12 : 0)
+        const scale = Math.max(0.35, 0.65 + d * 0.55) + (isHov ? 0.12 : 0)
         const size = baseSize * scale
 
         drawOrb(orb, pos.x, pos.y, size, alpha, isHov)
