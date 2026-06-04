@@ -112,7 +112,7 @@ export default function Galaxy({
       orb: Orb, x: number, y: number, size: number, alpha: number, isHov: boolean
     ) {
       const r = size / 2
-      const coverUrl = orb.images?.[0]
+      const coverUrl = orb.thumbnail || orb.images?.[0]
       const img = coverUrl ? getImg(coverUrl) : null
 
       ctx.save()

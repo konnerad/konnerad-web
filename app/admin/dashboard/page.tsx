@@ -26,10 +26,13 @@ export default function Dashboard() {
   const [form, setForm] = useState<FormData>(emptyForm())
   const [editing, setEditing] = useState<string | null>(null)
   const [images, setImages] = useState<string[]>([])
+  const [thumbnail, setThumbnail] = useState<string>('')
+  const [uploadingThumb, setUploadingThumb] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [panel, setPanel] = useState<'list' | 'edit'>('list')
   const fileRef = useRef<HTMLInputElement>(null)
+  const thumbRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
 
   async function load() {
@@ -44,6 +47,7 @@ export default function Dashboard() {
     setEditing(null)
     setForm(emptyForm())
     setImages([])
+    setThumbnail('')
     setPanel('edit')
   }
 
@@ -51,6 +55,7 @@ export default function Dashboard() {
     setEditing(p.id)
     setForm({ label: p.label, year: p.year, tag: p.tag, description: p.description, color: p.color, shape: p.shape })
     setImages(p.images ?? [])
+    setThumbnail(p.thumbnail ?? '')
     setPanel('edit')
   }
 
@@ -65,9 +70,20 @@ export default function Dashboard() {
     setUploading(false)
   }
 
+  async function uploadThumbnail(file: File) {
+    setUploadingThumb(true)
+    const fd = new FormData()
+    fd.append('file', file)
+    const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
+    const { url, error } = await res.json()
+    if (error) alert(error)
+    else setThumbnail(url)
+    setUploadingThumb(false)
+  }
+
   async function save() {
     setSaving(true)
-    const body = { ...form, images }
+    const body = { ...form, images, thumbnail }
     const method = editing ? 'PUT' : 'POST'
     const payload = editing ? { ...body, id: editing } : body
     const res = await fetch('/api/admin/projects', {
@@ -255,8 +271,48 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Right: images & videos */}
-              <div className="flex flex-col min-h-0">
+              {/* Right: thumbnail + images & videos */}
+              <div className="flex flex-col min-h-0 gap-6">
+
+                {/* Galaxy thumbnail */}
+                <div>
+                  <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(232,228,220,0.3)' }}>Galaxy Thumbnail</label>
+                  <div className="flex gap-3 items-start">
+                    {/* Preview */}
+                    <div
+                      className="rounded-full overflow-hidden shrink-0"
+                      style={{ width: 72, height: 72, background: thumbnail ? 'transparent' : 'rgba(232,228,220,0.06)', border: '0.5px solid rgba(232,228,220,0.15)' }}
+                    >
+                      {thumbnail && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={thumbnail} alt="" className="w-full h-full object-cover" />
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-2 flex-1">
+                      <input ref={thumbRef} type="file" accept="image/*" className="hidden"
+                        onChange={e => { const f = e.target.files?.[0]; if (f) uploadThumbnail(f); e.target.value = '' }}
+                      />
+                      <button
+                        onClick={() => thumbRef.current?.click()}
+                        className="px-3 py-2 text-[10px] tracking-wider uppercase rounded-sm text-left"
+                        style={{ background: 'rgba(232,228,220,0.05)', border: '0.5px solid rgba(232,228,220,0.12)', color: uploadingThumb ? 'rgba(232,228,220,0.4)' : 'rgba(232,228,220,0.6)' }}
+                      >
+                        {uploadingThumb ? 'Uploading…' : thumbnail ? 'Replace thumbnail' : 'Upload thumbnail'}
+                      </button>
+                      {thumbnail && (
+                        <button onClick={() => setThumbnail('')} className="text-[9px] tracking-wider uppercase text-left" style={{ color: '#D85A30' }}>
+                          Remove
+                        </button>
+                      )}
+                      <p className="text-[9px] leading-relaxed" style={{ color: 'rgba(232,228,220,0.2)' }}>
+                        Shown as the orbiting circle in the galaxy view. If left empty, the first gallery image is used.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Gallery images & videos */}
+                <div className="flex flex-col min-h-0">
                 <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(232,228,220,0.3)' }}>Images &amp; Videos</label>
                 <div
                   className="p-4 rounded-sm mb-3 text-center cursor-pointer transition-colors shrink-0"
@@ -340,7 +396,8 @@ export default function Dashboard() {
                     })}
                   </div>
                 </div>
-              </div>
+                </div> {/* end gallery section */}
+              </div> {/* end right column */}
             </div>
 
             <div className="flex gap-3 mt-8 pt-8 border-t" style={{ borderColor: 'rgba(232,228,220,0.08)' }}>

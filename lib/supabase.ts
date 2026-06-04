@@ -9,6 +9,7 @@ export type Project = {
   color: string
   shape: 'circle' | 'square' | 'diamond'
   images: string[]
+  thumbnail: string
   order_index: number
   created_at: string
 }
