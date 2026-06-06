@@ -96,7 +96,7 @@ export default function Galaxy({
       ctx.scale(1, GALAXY_Y)
       ctx.beginPath()
       ctx.arc(0, 0, radius, 0, Math.PI * 2)
-      ctx.strokeStyle = 'rgba(232,228,220,0.05)'
+      ctx.strokeStyle = 'rgba(0,0,0,0.1)'
       ctx.lineWidth = 0.5
       ctx.stroke()
       ctx.restore()
@@ -126,7 +126,7 @@ export default function Galaxy({
 
       if (img && img.naturalWidth > 0) {
         // Circular image
-        ctx.shadowColor = 'rgba(255,255,255,0.25)'
+        ctx.shadowColor = 'rgba(0,0,0,0.15)'
         ctx.shadowBlur = isHov ? 22 : 10
         ctx.beginPath()
         ctx.arc(x, y, r, 0, Math.PI * 2)
@@ -141,7 +141,7 @@ export default function Galaxy({
         ctx.shadowColor = orb.color
         ctx.shadowBlur = 18 * (isHov ? 1 : 0.4)
         ctx.fillStyle = orb.color
-        ctx.strokeStyle = 'rgba(255,255,255,0.15)'
+        ctx.strokeStyle = 'rgba(0,0,0,0.12)'
         ctx.lineWidth = 0.5
         ctx.beginPath()
         if (orb.shape === 'circle') {
@@ -165,7 +165,7 @@ export default function Galaxy({
       ctx.globalAlpha = Math.min(1, alpha) * (isHov ? 0.8 : 0.35)
       ctx.beginPath()
       ctx.arc(x, y, r, 0, Math.PI * 2)
-      ctx.strokeStyle = isHov ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.25)'
+      ctx.strokeStyle = isHov ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.18)'
       ctx.lineWidth = isHov ? 1.5 : 0.5
       ctx.stroke()
       ctx.restore()
@@ -201,12 +201,12 @@ export default function Galaxy({
         if (isHov) {
           ctx.save()
           ctx.globalAlpha = 0.9
-          ctx.fillStyle = '#e8e4dc'
-          ctx.font = '10px DM Mono, monospace'
+          ctx.fillStyle = '#111111'
+          ctx.font = '10px Helvetica Neue, Helvetica, Arial, sans-serif'
           ctx.textAlign = 'center'
           ctx.fillText(orb.label.toUpperCase(), pos.x, pos.y + size / 2 + 14)
           ctx.globalAlpha = 0.4
-          ctx.font = '9px DM Mono, monospace'
+          ctx.font = '9px Helvetica Neue, Helvetica, Arial, sans-serif'
           ctx.fillText(orb.year, pos.x, pos.y + size / 2 + 25)
           ctx.restore()
         }

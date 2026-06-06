@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+const F = "'Helvetica Neue', Helvetica, Arial, sans-serif"
+
 export default function AdminLogin() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -27,12 +29,9 @@ export default function AdminLogin() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: '#0a0a0f' }}>
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#F4F4F4', fontFamily: F }}>
       <div className="w-full max-w-sm" style={{ padding: '0 32px' }}>
-        <h1
-          className="text-3xl font-light tracking-widest uppercase mb-10 text-center"
-          style={{ fontFamily: "'Cormorant Garamond', serif", color: 'rgba(232,228,220,0.7)' }}
-        >
+        <h1 className="text-3xl font-light tracking-widest uppercase mb-10 text-center" style={{ color: 'rgba(0,0,0,0.6)' }}>
           Admin
         </h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -41,24 +40,26 @@ export default function AdminLogin() {
             placeholder="Password"
             value={password}
             onChange={e => setPassword(e.target.value)}
-            className="w-full px-4 py-3 text-[12px] tracking-wider outline-none rounded-sm"
+            className="w-full px-4 py-3 text-[12px] tracking-wider outline-none"
             style={{
-              background: 'rgba(232,228,220,0.05)',
-              border: '0.5px solid rgba(232,228,220,0.15)',
-              color: '#e8e4dc',
-              fontFamily: "'DM Mono', monospace",
+              background: '#fff',
+              border: '0.5px solid rgba(0,0,0,0.15)',
+              color: '#111111',
+              fontFamily: F,
             }}
           />
-          {error && <p className="text-[11px] tracking-wider" style={{ color: '#D85A30' }}>{error}</p>}
+          {error && <p className="text-[11px] tracking-wider" style={{ color: '#c0392b' }}>{error}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="py-3 text-[11px] tracking-[0.15em] uppercase transition-colors rounded-sm"
+            className="py-3 text-[11px] tracking-[0.15em] uppercase transition-colors"
             style={{
-              background: 'rgba(232,228,220,0.08)',
-              border: '0.5px solid rgba(232,228,220,0.2)',
-              color: 'rgba(232,228,220,0.7)',
-              fontFamily: "'DM Mono', monospace",
+              background: '#111111',
+              border: 'none',
+              color: '#F4F4F4',
+              fontFamily: F,
+              cursor: loading ? 'not-allowed' : 'pointer',
+              opacity: loading ? 0.5 : 1,
             }}
           >
             {loading ? 'Entering…' : 'Enter'}

@@ -2,7 +2,13 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body { height: 100%; overflow: hidden; }
+html, body {
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background: #F4F4F4;
+  color: #111111;
+}
 
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -10,9 +16,9 @@ html, body { height: 100%; overflow: hidden; }
 }
 
 .gallery-arrow {
-  background: rgba(10,10,15,0.5);
-  border: 0.5px solid rgba(232,228,220,0.15);
-  color: rgba(232,228,220,0.6);
+  background: rgba(244,244,244,0.7);
+  border: 0.5px solid rgba(0,0,0,0.15);
+  color: rgba(0,0,0,0.5);
   width: 40px;
   height: 40px;
   display: flex;
@@ -25,9 +31,9 @@ html, body { height: 100%; overflow: hidden; }
   transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
 .gallery-arrow:hover {
-  background: rgba(232,228,220,0.12);
-  color: #e8e4dc;
-  border-color: rgba(232,228,220,0.35);
+  background: rgba(0,0,0,0.06);
+  color: #111111;
+  border-color: rgba(0,0,0,0.3);
 }
 .gallery-arrow:disabled {
   opacity: 0.2;

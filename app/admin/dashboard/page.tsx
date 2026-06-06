@@ -118,24 +118,24 @@ export default function Dashboard() {
 
   const inputClass = "w-full px-3 py-2.5 text-[12px] outline-none rounded-sm"
   const inputStyle = {
-    background: 'rgba(232,228,220,0.05)',
-    border: '0.5px solid rgba(232,228,220,0.12)',
-    color: '#e8e4dc',
-    fontFamily: "'DM Mono', monospace",
+    background: '#ffffff',
+    border: '0.5px solid rgba(0,0,0,0.12)',
+    color: '#111111',
+    fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
   }
 
   return (
-    <div className="min-h-screen" style={{ background: '#0a0a0f', color: '#e8e4dc', fontFamily: "'DM Mono', monospace" }}>
+    <div className="min-h-screen" style={{ background: '#F4F4F4', color: '#111111', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
       {/* Header */}
-      <div className="flex items-center justify-between border-b" style={{ borderColor: 'rgba(232,228,220,0.08)', padding: '20px 40px' }}>
-        <h1 className="text-[11px] tracking-[0.2em] uppercase" style={{ color: 'rgba(232,228,220,0.4)' }}>
+      <div className="flex items-center justify-between border-b" style={{ borderColor: 'rgba(0,0,0,0.08)', padding: '20px 40px' }}>
+        <h1 className="text-[11px] tracking-[0.2em] uppercase" style={{ color: 'rgba(0,0,0,0.45)' }}>
           konnerad.com / admin
         </h1>
         <div className="flex gap-4">
-          <a href="/" target="_blank" className="text-[10px] tracking-wider uppercase" style={{ color: 'rgba(232,228,220,0.3)' }}>
+          <a href="/" target="_blank" className="text-[10px] tracking-wider uppercase" style={{ color: 'rgba(0,0,0,0.35)' }}>
             View site ↗
           </a>
-          <button onClick={logout} className="text-[10px] tracking-wider uppercase" style={{ color: 'rgba(232,228,220,0.3)' }}>
+          <button onClick={logout} className="text-[10px] tracking-wider uppercase" style={{ color: 'rgba(0,0,0,0.35)' }}>
             Log out
           </button>
         </div>
@@ -145,13 +145,13 @@ export default function Dashboard() {
         {panel === 'list' ? (
           <>
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-[13px] tracking-[0.15em] uppercase" style={{ color: 'rgba(232,228,220,0.5)' }}>
+              <h2 className="text-[13px] tracking-[0.15em] uppercase" style={{ color: 'rgba(0,0,0,0.5)' }}>
                 Projects ({projects.length})
               </h2>
               <button
                 onClick={startNew}
                 className="px-4 py-2 text-[10px] tracking-[0.12em] uppercase rounded-sm"
-                style={{ background: 'rgba(232,228,220,0.08)', border: '0.5px solid rgba(232,228,220,0.2)', color: 'rgba(232,228,220,0.7)' }}
+                style={{ background: 'rgba(0,0,0,0.08)', border: '0.5px solid rgba(0,0,0,0.2)', color: 'rgba(0,0,0,0.7)' }}
               >
                 + New project
               </button>
@@ -162,20 +162,20 @@ export default function Dashboard() {
                 <div
                   key={p.id}
                   className="flex items-center justify-between px-4 py-3 rounded-sm"
-                  style={{ background: 'rgba(232,228,220,0.03)', border: '0.5px solid rgba(232,228,220,0.07)' }}
+                  style={{ background: 'rgba(0,0,0,0.03)', border: '0.5px solid rgba(232,228,220,0.07)' }}
                 >
                   <div className="flex items-center gap-4">
                     <div className="w-3 h-3 rounded-full shrink-0" style={{ background: p.color }} />
                     <div>
                       <p className="text-[12px]">{p.label}</p>
-                      <p className="text-[10px] mt-0.5" style={{ color: 'rgba(232,228,220,0.3)' }}>{p.year} · {p.tag} · {p.images?.length ?? 0} images</p>
+                      <p className="text-[10px] mt-0.5" style={{ color: 'rgba(0,0,0,0.35)' }}>{p.year} · {p.tag} · {p.images?.length ?? 0} images</p>
                     </div>
                   </div>
                   <div className="flex gap-3">
                     <button
                       onClick={() => startEdit(p)}
                       className="text-[10px] tracking-wider uppercase"
-                      style={{ color: 'rgba(232,228,220,0.4)' }}
+                      style={{ color: 'rgba(0,0,0,0.45)' }}
                     >
                       Edit
                     </button>
@@ -190,7 +190,7 @@ export default function Dashboard() {
                 </div>
               ))}
               {projects.length === 0 && (
-                <p className="text-[12px] py-8 text-center" style={{ color: 'rgba(232,228,220,0.2)' }}>
+                <p className="text-[12px] py-8 text-center" style={{ color: 'rgba(0,0,0,0.2)' }}>
                   No projects yet — add your first one
                 </p>
               )}
@@ -199,10 +199,10 @@ export default function Dashboard() {
         ) : (
           <>
             <div className="flex items-center gap-4 mb-8">
-              <button onClick={() => setPanel('list')} className="text-[10px] tracking-wider uppercase" style={{ color: 'rgba(232,228,220,0.3)' }}>
+              <button onClick={() => setPanel('list')} className="text-[10px] tracking-wider uppercase" style={{ color: 'rgba(0,0,0,0.35)' }}>
                 ← Back
               </button>
-              <h2 className="text-[13px] tracking-[0.15em] uppercase" style={{ color: 'rgba(232,228,220,0.5)' }}>
+              <h2 className="text-[13px] tracking-[0.15em] uppercase" style={{ color: 'rgba(0,0,0,0.5)' }}>
                 {editing ? 'Edit project' : 'New project'}
               </h2>
             </div>
@@ -211,25 +211,25 @@ export default function Dashboard() {
               {/* Left: form */}
               <div className="flex flex-col gap-4">
                 <div>
-                  <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(232,228,220,0.3)' }}>Title</label>
+                  <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(0,0,0,0.35)' }}>Title</label>
                   <input className={inputClass} style={inputStyle} value={form.label} onChange={e => setForm(f => ({ ...f, label: e.target.value }))} placeholder="Project name" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(232,228,220,0.3)' }}>Year</label>
+                    <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(0,0,0,0.35)' }}>Year</label>
                     <input className={inputClass} style={inputStyle} value={form.year} onChange={e => setForm(f => ({ ...f, year: e.target.value }))} />
                   </div>
                   <div>
-                    <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(232,228,220,0.3)' }}>Type / Tag</label>
+                    <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(0,0,0,0.35)' }}>Type / Tag</label>
                     <input className={inputClass} style={inputStyle} value={form.tag} onChange={e => setForm(f => ({ ...f, tag: e.target.value }))} placeholder="e.g. Branding" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(232,228,220,0.3)' }}>Client</label>
+                  <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(0,0,0,0.35)' }}>Client</label>
                   <input className={inputClass} style={inputStyle} value={form.client} onChange={e => setForm(f => ({ ...f, client: e.target.value }))} placeholder="Client name" />
                 </div>
                 <div>
-                  <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(232,228,220,0.3)' }}>Description</label>
+                  <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(0,0,0,0.35)' }}>Description</label>
                   <textarea
                     className={inputClass} style={{ ...inputStyle, resize: 'vertical', minHeight: '100px' }}
                     value={form.description}
@@ -238,7 +238,7 @@ export default function Dashboard() {
                   />
                 </div>
                 <div>
-                  <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(232,228,220,0.3)' }}>Colour</label>
+                  <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(0,0,0,0.35)' }}>Colour</label>
                   <div className="flex gap-2 flex-wrap">
                     {COLORS.map(c => (
                       <button
@@ -256,7 +256,7 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(232,228,220,0.3)' }}>Shape</label>
+                  <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(0,0,0,0.35)' }}>Shape</label>
                   <div className="flex gap-2">
                     {SHAPES.map(s => (
                       <button
@@ -264,9 +264,9 @@ export default function Dashboard() {
                         onClick={() => setForm(f => ({ ...f, shape: s }))}
                         className="px-3 py-1.5 text-[10px] tracking-wider uppercase rounded-sm transition-colors"
                         style={{
-                          background: form.shape === s ? 'rgba(232,228,220,0.15)' : 'rgba(232,228,220,0.05)',
-                          border: `0.5px solid ${form.shape === s ? 'rgba(232,228,220,0.4)' : 'rgba(232,228,220,0.1)'}`,
-                          color: form.shape === s ? '#e8e4dc' : 'rgba(232,228,220,0.4)',
+                          background: form.shape === s ? 'rgba(0,0,0,0.15)' : 'rgba(232,228,220,0.05)',
+                          border: `0.5px solid ${form.shape === s ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.1)'}`,
+                          color: form.shape === s ? '#111111' : 'rgba(0,0,0,0.45)',
                         }}
                       >
                         {s}
@@ -281,12 +281,12 @@ export default function Dashboard() {
 
                 {/* Galaxy thumbnail */}
                 <div>
-                  <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(232,228,220,0.3)' }}>Galaxy Thumbnail</label>
+                  <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(0,0,0,0.35)' }}>Galaxy Thumbnail</label>
                   <div className="flex gap-3 items-start">
                     {/* Preview */}
                     <div
                       className="rounded-full overflow-hidden shrink-0"
-                      style={{ width: 72, height: 72, background: thumbnail ? 'transparent' : 'rgba(232,228,220,0.06)', border: '0.5px solid rgba(232,228,220,0.15)' }}
+                      style={{ width: 72, height: 72, background: thumbnail ? 'transparent' : 'rgba(232,228,220,0.06)', border: '0.5px solid rgba(0,0,0,0.15)' }}
                     >
                       {thumbnail && (
                         // eslint-disable-next-line @next/next/no-img-element
@@ -300,7 +300,7 @@ export default function Dashboard() {
                       <button
                         onClick={() => thumbRef.current?.click()}
                         className="px-3 py-2 text-[10px] tracking-wider uppercase rounded-sm text-left"
-                        style={{ background: 'rgba(232,228,220,0.05)', border: '0.5px solid rgba(232,228,220,0.12)', color: uploadingThumb ? 'rgba(232,228,220,0.4)' : 'rgba(232,228,220,0.6)' }}
+                        style={{ background: '#ffffff', border: '0.5px solid rgba(0,0,0,0.12)', color: uploadingThumb ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.6)' }}
                       >
                         {uploadingThumb ? 'Uploading…' : thumbnail ? 'Replace thumbnail' : 'Upload thumbnail'}
                       </button>
@@ -309,7 +309,7 @@ export default function Dashboard() {
                           Remove
                         </button>
                       )}
-                      <p className="text-[9px] leading-relaxed" style={{ color: 'rgba(232,228,220,0.2)' }}>
+                      <p className="text-[9px] leading-relaxed" style={{ color: 'rgba(0,0,0,0.2)' }}>
                         Shown as the orbiting circle in the galaxy view. If left empty, the first gallery image is used.
                       </p>
                     </div>
@@ -318,10 +318,10 @@ export default function Dashboard() {
 
                 {/* Gallery images & videos */}
                 <div className="flex flex-col min-h-0">
-                <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(232,228,220,0.3)' }}>Images &amp; Videos</label>
+                <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(0,0,0,0.35)' }}>Images &amp; Videos</label>
                 <div
                   className="p-4 rounded-sm mb-3 text-center cursor-pointer transition-colors shrink-0"
-                  style={{ border: '1px dashed rgba(232,228,220,0.15)', background: 'rgba(232,228,220,0.02)' }}
+                  style={{ border: '1px dashed rgba(0,0,0,0.15)', background: 'rgba(0,0,0,0.02)' }}
                   onClick={() => fileRef.current?.click()}
                 >
                   <input
@@ -335,13 +335,13 @@ export default function Dashboard() {
                       e.target.value = ''
                     }}
                   />
-                  <p className="text-[11px]" style={{ color: uploading ? 'rgba(232,228,220,0.6)' : 'rgba(232,228,220,0.25)' }}>
+                  <p className="text-[11px]" style={{ color: uploading ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.25)' }}>
                     {uploading ? 'Uploading…' : '+ Click to upload images or videos'}
                   </p>
                 </div>
 
                 {images.length > 0 && (
-                  <p className="text-[9px] tracking-wider mb-2 shrink-0" style={{ color: 'rgba(232,228,220,0.25)' }}>
+                  <p className="text-[9px] tracking-wider mb-2 shrink-0" style={{ color: 'rgba(0,0,0,0.25)' }}>
                     Click an image to set it as the galaxy cover
                   </p>
                 )}
@@ -356,7 +356,7 @@ export default function Dashboard() {
                         <div
                           key={url}
                           className="relative group rounded-sm overflow-hidden aspect-square bg-black cursor-pointer"
-                          style={{ outline: isCover ? '2px solid rgba(232,228,220,0.5)' : 'none', outlineOffset: '2px' }}
+                          style={{ outline: isCover ? '2px solid rgba(0,0,0,0.5)' : 'none', outlineOffset: '2px' }}
                           onClick={() => {
                             if (i === 0) return
                             setImages(prev => {
@@ -381,7 +381,7 @@ export default function Dashboard() {
                               setImages(prev => prev.filter((_, j) => j !== i))
                             }}
                             className="absolute top-1 right-1 w-6 h-6 flex items-center justify-center rounded-full text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"
-                            style={{ background: 'rgba(10,10,15,0.8)', color: '#e8e4dc' }}
+                            style={{ background: 'rgba(244,244,244,0.9)', color: '#111111' }}
                           >
                             ×
                           </button>
@@ -390,8 +390,8 @@ export default function Dashboard() {
                           <span
                             className="absolute bottom-1 left-1 text-[8px] tracking-wider px-1.5 py-0.5 rounded-sm"
                             style={{
-                              background: isCover ? 'rgba(232,228,220,0.25)' : 'rgba(10,10,15,0.7)',
-                              color: isCover ? '#e8e4dc' : 'rgba(232,228,220,0.5)',
+                              background: isCover ? 'rgba(0,0,0,0.25)' : 'rgba(244,244,244,0.85)',
+                              color: isCover ? '#111111' : 'rgba(0,0,0,0.5)',
                             }}
                           >
                             {isCover ? '★ Cover' : video ? 'Video' : `${i + 1}`}
@@ -405,19 +405,19 @@ export default function Dashboard() {
               </div> {/* end right column */}
             </div>
 
-            <div className="flex gap-3 mt-8 pt-8 border-t" style={{ borderColor: 'rgba(232,228,220,0.08)' }}>
+            <div className="flex gap-3 mt-8 pt-8 border-t" style={{ borderColor: 'rgba(0,0,0,0.08)' }}>
               <button
                 onClick={save}
                 disabled={saving || !form.label}
                 className="px-6 py-2.5 text-[11px] tracking-[0.12em] uppercase rounded-sm transition-colors"
-                style={{ background: 'rgba(232,228,220,0.1)', border: '0.5px solid rgba(232,228,220,0.25)', color: saving ? 'rgba(232,228,220,0.3)' : 'rgba(232,228,220,0.8)' }}
+                style={{ background: 'rgba(0,0,0,0.1)', border: '0.5px solid rgba(0,0,0,0.25)', color: saving ? 'rgba(0,0,0,0.35)' : 'rgba(0,0,0,0.8)' }}
               >
                 {saving ? 'Saving…' : (editing ? 'Save changes' : 'Add project')}
               </button>
               <button
                 onClick={() => setPanel('list')}
                 className="px-4 py-2.5 text-[11px] tracking-[0.12em] uppercase"
-                style={{ color: 'rgba(232,228,220,0.3)' }}
+                style={{ color: 'rgba(0,0,0,0.35)' }}
               >
                 Cancel
               </button>

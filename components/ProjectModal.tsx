@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Project } from '@/lib/supabase'
 
+const F = "'Helvetica Neue', Helvetica, Arial, sans-serif"
+
 function isVideo(url: string) {
   return /\.(mp4|mov|webm|m4v|avi)(\?|$)/i.test(url)
 }
@@ -32,7 +34,7 @@ export default function ProjectModal({
 
   const close = useCallback(() => {
     setVisible(false)
-    setTimeout(onClose, 520)
+    setTimeout(onClose, 420)
   }, [onClose])
 
   useEffect(() => {
@@ -57,23 +59,31 @@ export default function ProjectModal({
     { label: 'Type',   value: project?.tag    || '—' },
   ]
 
+  const border = '0.5px solid rgba(0,0,0,0.1)'
+
   return (
     <div
       className="fixed inset-0 z-[200]"
       style={{
-        background: '#0a0a0f',
+        background: '#F4F4F4',
+        fontFamily: F,
         transform: visible ? 'translateX(0)' : 'translateX(100%)',
-        transition: 'transform 0.5s cubic-bezier(0.77,0,0.18,1)',
+        transition: 'transform 0.4s cubic-bezier(0.77,0,0.18,1)',
         overflowY: 'auto',
       }}
     >
       {/* Back */}
       <button
         onClick={close}
-        className="fixed top-7 left-8 z-[210] text-[10px] tracking-[0.14em] uppercase flex items-center gap-2 transition-colors"
-        style={{ color: 'rgba(232,228,220,0.35)', fontFamily: "'DM Mono', monospace" }}
-        onMouseEnter={e => (e.currentTarget.style.color = '#e8e4dc')}
-        onMouseLeave={e => (e.currentTarget.style.color = 'rgba(232,228,220,0.35)')}
+        style={{
+          position: 'fixed', top: 28, left: 32, zIndex: 210,
+          fontFamily: F, fontSize: '10px', letterSpacing: '0.12em',
+          textTransform: 'uppercase', color: 'rgba(0,0,0,0.4)',
+          background: 'none', border: 'none', cursor: 'pointer',
+          display: 'flex', alignItems: 'center', gap: '6px',
+        }}
+        onMouseEnter={e => (e.currentTarget.style.color = '#111111')}
+        onMouseLeave={e => (e.currentTarget.style.color = 'rgba(0,0,0,0.4)')}
       >
         ← Back
       </button>
@@ -81,40 +91,34 @@ export default function ProjectModal({
       {/* ── Desktop ── */}
       <div className="hidden md:grid h-screen" style={{ gridTemplateColumns: '1fr 1fr' }}>
         {/* Text */}
-        <div
-          className="overflow-y-auto flex flex-col"
-          style={{ padding: '100px 60px 60px', borderRight: '0.5px solid rgba(232,228,220,0.07)' }}
-        >
-          <span className="text-[9px] tracking-[0.22em] uppercase mb-5" style={{ color: 'rgba(232,228,220,0.3)' }}>
+        <div style={{ padding: '100px 60px 60px', borderRight: border, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+          <span style={{ fontSize: '9px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.35)', marginBottom: 20 }}>
             {refNum} — {project?.tag}
           </span>
-          <h2
-            className="font-light leading-[1.1] mb-2.5"
-            style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(36px,4.5vw,64px)', color: '#e8e4dc' }}
-          >
+          <h2 style={{ fontSize: 'clamp(32px,4vw,56px)', fontWeight: 300, lineHeight: 1.1, color: '#111111', marginBottom: 10 }}>
             {project?.label}
           </h2>
-          <span className="text-[10px] tracking-[0.18em] mb-12" style={{ color: 'rgba(232,228,220,0.25)' }}>
+          <span style={{ fontSize: '10px', letterSpacing: '0.15em', color: 'rgba(0,0,0,0.3)', marginBottom: 48 }}>
             {project?.year}
           </span>
-          <div className="w-8 mb-8" style={{ height: '0.5px', background: 'rgba(232,228,220,0.2)' }} />
-          <p className="text-[12.5px] leading-[1.9] mb-12" style={{ color: 'rgba(232,228,220,0.55)', maxWidth: '42ch' }}>
+          <div style={{ width: 32, height: '0.5px', background: 'rgba(0,0,0,0.15)', marginBottom: 32 }} />
+          <p style={{ fontSize: '13px', lineHeight: 1.9, color: 'rgba(0,0,0,0.55)', maxWidth: '42ch', marginBottom: 48 }}>
             {project?.description}
           </p>
-          <div className="mt-auto flex flex-col">
+          <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column' }}>
             {metaRows.map(({ label, value }) => (
-              <div key={label} className="flex gap-4 py-3" style={{ borderTop: '0.5px solid rgba(232,228,220,0.07)' }}>
-                <span className="text-[9px] tracking-[0.16em] uppercase w-16 shrink-0" style={{ color: 'rgba(232,228,220,0.22)' }}>
+              <div key={label} style={{ display: 'flex', gap: 16, padding: '12px 0', borderTop: border }}>
+                <span style={{ fontSize: '9px', letterSpacing: '0.16em', textTransform: 'uppercase', width: 64, flexShrink: 0, color: 'rgba(0,0,0,0.3)' }}>
                   {label}
                 </span>
-                <span className="text-[11px]" style={{ color: 'rgba(232,228,220,0.5)' }}>{value}</span>
+                <span style={{ fontSize: '11px', color: 'rgba(0,0,0,0.6)' }}>{value}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* Gallery */}
-        <div className="relative flex items-center justify-center overflow-hidden" style={{ background: '#060609' }}>
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', background: '#ebebeb' }}>
           <GalleryMedia images={images} imgIndex={imgIndex} setImgIndex={setImgIndex} imgCount={imgCount} project={project} />
         </div>
       </div>
@@ -124,55 +128,43 @@ export default function ProjectModal({
 
         {/* Name + ref */}
         <div style={{ padding: '0 24px 24px' }}>
-          <p className="text-[9px] tracking-[0.2em] uppercase mb-3" style={{ color: 'rgba(232,228,220,0.3)' }}>
+          <p style={{ fontSize: '9px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.35)', marginBottom: 10 }}>
             {refNum}
           </p>
-          <h2
-            className="font-light leading-[1.2]"
-            style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '24px', color: '#e8e4dc' }}
-          >
+          <h2 style={{ fontSize: '22px', fontWeight: 300, lineHeight: 1.2, color: '#111111' }}>
             {project?.label}
           </h2>
         </div>
 
-        {/* Gallery — full width but with side margins */}
+        {/* Gallery */}
         <div style={{ margin: '0 24px' }}>
-          <div className="relative w-full overflow-hidden" style={{ aspectRatio: '4/3', background: '#060609', borderRadius: '2px' }}>
+          <div style={{ position: 'relative', width: '100%', aspectRatio: '4/3', background: '#ebebeb', borderRadius: 2, overflow: 'hidden' }}>
             <GalleryMedia images={images} imgIndex={imgIndex} setImgIndex={setImgIndex} imgCount={imgCount} project={project} />
           </div>
         </div>
 
         {/* Meta rows */}
-        <div style={{ margin: '32px 24px 0', borderTop: '0.5px solid rgba(232,228,220,0.12)' }}>
+        <div style={{ margin: '32px 24px 0', borderTop: border }}>
           {metaRows.map(({ label, value }) => (
-            <div
-              key={label}
-              className="flex justify-between items-baseline"
-              style={{ padding: '14px 0', borderBottom: '0.5px solid rgba(232,228,220,0.12)' }}
-            >
-              <span className="text-[9px] tracking-[0.18em] uppercase" style={{ color: 'rgba(232,228,220,0.3)' }}>
+            <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '14px 0', borderBottom: border }}>
+              <span style={{ fontSize: '9px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.35)' }}>
                 {label}
               </span>
-              <span className="text-[12px]" style={{ color: 'rgba(232,228,220,0.65)', fontFamily: "'DM Mono', monospace" }}>
-                {value}
-              </span>
+              <span style={{ fontSize: '12px', color: 'rgba(0,0,0,0.65)' }}>{value}</span>
             </div>
           ))}
         </div>
 
         {/* Description */}
-        <p style={{ margin: '32px 24px 0', fontSize: '13px', lineHeight: '1.9', color: 'rgba(232,228,220,0.5)' }}>
+        <p style={{ margin: '32px 24px 0', fontSize: '13px', lineHeight: 1.9, color: 'rgba(0,0,0,0.55)' }}>
           {project?.description}
         </p>
-
       </div>
     </div>
   )
 }
 
-function GalleryMedia({
-  images, imgIndex, setImgIndex, imgCount, project,
-}: {
+function GalleryMedia({ images, imgIndex, setImgIndex, imgCount, project }: {
   images: string[]
   imgIndex: number
   setImgIndex: React.Dispatch<React.SetStateAction<number>>
@@ -183,46 +175,22 @@ function GalleryMedia({
     <>
       {images.length > 0 ? (
         isVideo(images[imgIndex]) ? (
-          <video
-            key={imgIndex}
-            src={images[imgIndex]}
-            controls
-            className="max-w-full max-h-full"
-            style={{ animation: 'fadeIn 0.45s ease' }}
-          />
+          <video key={imgIndex} src={images[imgIndex]} controls className="max-w-full max-h-full" style={{ animation: 'fadeIn 0.35s ease' }} />
         ) : (
           // eslint-disable-next-line @next/next/no-img-element
-          <img
-            key={imgIndex}
-            src={images[imgIndex]}
-            alt=""
-            className="max-w-full max-h-full object-contain"
-            style={{ animation: 'fadeIn 0.45s ease' }}
-          />
+          <img key={imgIndex} src={images[imgIndex]} alt="" className="max-w-full max-h-full object-contain" style={{ animation: 'fadeIn 0.35s ease' }} />
         )
       ) : (
-        <div className="w-full h-full" style={{ background: project?.color ?? '#111', opacity: 0.4 }} />
+        <div className="w-full h-full" style={{ background: project?.color ?? '#ddd', opacity: 0.3 }} />
       )}
 
       {imgCount > 1 && (
         <>
-          <button
-            onClick={() => setImgIndex(i => Math.max(0, i - 1))}
-            disabled={imgIndex === 0}
-            className="gallery-arrow absolute left-5 top-1/2 -translate-y-1/2 z-10"
-          >←</button>
-          <button
-            onClick={() => setImgIndex(i => Math.min(imgCount - 1, i + 1))}
-            disabled={imgIndex === imgCount - 1}
-            className="gallery-arrow absolute right-5 top-1/2 -translate-y-1/2 z-10"
-          >→</button>
+          <button onClick={() => setImgIndex(i => Math.max(0, i - 1))} disabled={imgIndex === 0} className="gallery-arrow absolute left-5 top-1/2 -translate-y-1/2 z-10">←</button>
+          <button onClick={() => setImgIndex(i => Math.min(imgCount - 1, i + 1))} disabled={imgIndex === imgCount - 1} className="gallery-arrow absolute right-5 top-1/2 -translate-y-1/2 z-10">→</button>
         </>
       )}
-
-      <span
-        className="absolute bottom-5 left-1/2 -translate-x-1/2 z-10 text-[9px] tracking-[0.2em]"
-        style={{ color: 'rgba(232,228,220,0.3)' }}
-      >
+      <span className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10" style={{ fontSize: '9px', letterSpacing: '0.2em', color: 'rgba(0,0,0,0.35)' }}>
         {imgIndex + 1} / {imgCount}
       </span>
     </>
