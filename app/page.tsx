@@ -51,19 +51,55 @@ export default function Home() {
         />
       </div>
 
-      {/* Toggle */}
-      <button
-        onClick={() => setIsGrid(v => !v)}
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 text-[11px] tracking-[0.12em] uppercase px-5 py-2 transition-colors"
+      {/* Toggle — icon pill */}
+      <div
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10"
         style={{
-          fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+          display: 'flex',
+          position: 'relative',
           background: 'rgba(0,0,0,0.06)',
-          border: '0.5px solid rgba(0,0,0,0.2)',
-          color: 'rgba(0,0,0,0.6)',
+          borderRadius: 999,
+          padding: 4,
+          gap: 0,
         }}
       >
-        {isGrid ? 'Disc View' : 'List View'}
-      </button>
+        {/* Sliding indicator */}
+        <div style={{
+          position: 'absolute',
+          top: 4, left: 4,
+          width: 36, height: 36,
+          borderRadius: '50%',
+          background: 'rgba(0,0,0,0.13)',
+          transform: `translateX(${isGrid ? 40 : 0}px)`,
+          transition: 'transform 0.45s cubic-bezier(0.34,1.56,0.64,1)',
+          pointerEvents: 'none',
+        }} />
+
+        {/* Disc icon */}
+        <button
+          onClick={() => setIsGrid(false)}
+          style={{ width: 36, height: 36, borderRadius: '50%', border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 4 }}
+          title="Disc view"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="6.5" stroke={isGrid ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.75)'} strokeWidth="1.5" />
+            <circle cx="8" cy="8" r="1.5" fill={isGrid ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.75)'} />
+          </svg>
+        </button>
+
+        {/* List icon */}
+        <button
+          onClick={() => setIsGrid(true)}
+          style={{ width: 36, height: 36, borderRadius: '50%', border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          title="List view"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            {[4, 8, 12].map(y => (
+              <line key={y} x1="2" y1={y} x2="14" y2={y} stroke={isGrid ? 'rgba(0,0,0,0.75)' : 'rgba(0,0,0,0.3)'} strokeWidth="1.5" strokeLinecap="round" />
+            ))}
+          </svg>
+        </button>
+      </div>
 
       {/* Project modal */}
       <ProjectModal state={modal} onClose={closeProject} />
