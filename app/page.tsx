@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import Galaxy from '@/components/Galaxy'
+import ViewmasterDisc from '@/components/ViewmasterDisc'
 import GridView from '@/components/GridView'
 import ProjectModal, { ModalState } from '@/components/ProjectModal'
 import { Project } from '@/lib/supabase'
@@ -18,10 +18,10 @@ export default function Home() {
       .catch(console.error)
   }, [])
 
-  const openProject = useCallback((project: Project, screenX: number, screenY: number) => {
+  const openProject = useCallback((project: Project) => {
     const idx = projects.findIndex(p => p.id === project.id)
     const refNum = `P${String(idx + 1).padStart(3, '0')}`
-    setModal({ open: true, project, refNum, originX: screenX, originY: screenY })
+    setModal({ open: true, project, refNum, originX: window.innerWidth / 2, originY: window.innerHeight / 2 })
   }, [projects])
 
   const closeProject = useCallback(() => {
@@ -35,7 +35,7 @@ export default function Home() {
         className="absolute inset-0 transition-opacity duration-500"
         style={{ opacity: isGrid ? 0 : 1, pointerEvents: isGrid ? 'none' : 'auto' }}
       >
-        <Galaxy projects={projects} onSelect={openProject} />
+        <ViewmasterDisc projects={projects} onSelect={openProject} />
       </div>
 
       {/* Grid */}
@@ -46,7 +46,7 @@ export default function Home() {
         <GridView
           projects={projects}
           onSelect={(p, refNum) => {
-            setModal({ open: true, project: p, refNum, originX: window.innerWidth / 2, originY: window.innerHeight / 2 })
+            setModal({ open: true, project: p, refNum, originX: 0, originY: 0 })
           }}
         />
       </div>
@@ -62,7 +62,7 @@ export default function Home() {
           color: 'rgba(0,0,0,0.6)',
         }}
       >
-        {isGrid ? 'Orbit View' : 'Grid View'}
+        {isGrid ? 'Disc View' : 'Grid View'}
       </button>
 
       {/* Project modal */}
