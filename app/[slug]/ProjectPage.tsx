@@ -15,27 +15,23 @@ export default function ProjectPage({ slug }: { slug: string }) {
   const [project, setProject] = useState<Project | null>(null)
   const [refNum, setRefNum] = useState('')
   const [notFound, setNotFound] = useState(false)
-  const [debugInfo, setDebugInfo] = useState('')
 
   useEffect(() => {
     fetch('/api/projects')
       .then(r => r.json())
       .then((projects: Project[]) => {
-        const slugs = projects.map(p => slugify(p.label))
-        setDebugInfo(`URL slug: "${slug}" | Available: ${slugs.join(', ')}`)
         const idx = projects.findIndex(p => slugify(p.label) === slug)
         if (idx === -1) { setNotFound(true); return }
         setProject(projects[idx])
         setRefNum(`P${String(idx + 1).padStart(3, '0')}`)
       })
-      .catch(e => { setDebugInfo(`Fetch error: ${e}`); setNotFound(true) })
+      .catch(() => setNotFound(true))
   }, [slug])
 
   if (notFound) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: F, gap: 16, padding: 24 }}>
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: F, gap: 16 }}>
         <span style={{ fontSize: 13, color: 'rgba(0,0,0,0.4)', letterSpacing: '0.1em' }}>Project not found</span>
-        <pre style={{ fontSize: 11, color: 'rgba(0,0,0,0.4)', whiteSpace: 'pre-wrap', wordBreak: 'break-all', maxWidth: 600, textAlign: 'center' }}>{debugInfo}</pre>
         <Link href="/" style={{ fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.4)', textDecoration: 'none' }}>
           ← Back
         </Link>
