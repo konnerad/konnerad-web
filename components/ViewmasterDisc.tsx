@@ -137,24 +137,22 @@ export default function ViewmasterDisc({
           spinning: splits to left and right wings, then merges back
         */}
         <g style={{ transition: 'opacity 0.30s ease', opacity: shadowLifted ? 0 : 1 }}>
-          {/* Resting shadow */}
-          <ellipse cx={CX + 35} cy={CY + DISC_R - 8} rx={DISC_R * 0.74} ry={32}
-            fill="black" filter="url(#shadowBlur)" opacity={0.20} />
+          {/* Resting shadow — oval, not flat, so it reads as a real disc */}
+          <ellipse cx={CX + 28} cy={CY + DISC_R - 55} rx={DISC_R * 0.58} ry={52}
+            fill="black" filter="url(#shadowBlur)" opacity={0.18} />
         </g>
         <g style={{ transition: 'opacity 0.30s ease', opacity: shadowLifted ? 1 : 0 }}>
-          {/* Left wing */}
           <ellipse
-            cx={CX} cy={CY + DISC_R - 8}
-            rx={DISC_R * 0.36} ry={20}
-            fill="black" filter="url(#shadowBlur)" opacity={0.13}
-            style={{ transform: `translateX(${shadowLifted ? '-200px' : '0'})`, transition: 'transform 0.32s cubic-bezier(0.4,0,0.2,1)' }}
+            cx={CX} cy={CY + DISC_R - 55}
+            rx={DISC_R * 0.28} ry={36}
+            fill="black" filter="url(#shadowBlur)" opacity={0.12}
+            style={{ transform: `translateX(${shadowLifted ? '-180px' : '0'})`, transition: 'transform 0.32s cubic-bezier(0.4,0,0.2,1)' }}
           />
-          {/* Right wing */}
           <ellipse
-            cx={CX} cy={CY + DISC_R - 8}
-            rx={DISC_R * 0.36} ry={20}
-            fill="black" filter="url(#shadowBlur)" opacity={0.13}
-            style={{ transform: `translateX(${shadowLifted ? '200px' : '0'})`, transition: 'transform 0.32s cubic-bezier(0.4,0,0.2,1)' }}
+            cx={CX} cy={CY + DISC_R - 55}
+            rx={DISC_R * 0.28} ry={36}
+            fill="black" filter="url(#shadowBlur)" opacity={0.12}
+            style={{ transform: `translateX(${shadowLifted ? '180px' : '0'})`, transition: 'transform 0.32s cubic-bezier(0.4,0,0.2,1)' }}
           />
         </g>
 

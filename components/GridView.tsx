@@ -11,7 +11,7 @@ export default function GridView({
   onSelect,
 }: {
   projects: Project[]
-  onSelect: (project: Project, refNum: string) => void
+  onSelect: (project: Project) => void
 }) {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
   const [isMobile, setIsMobile] = useState(false)
@@ -63,14 +63,13 @@ export default function GridView({
 
         {/* Rows */}
         {projects.map((p, i) => {
-          const refNum = `P${String(i + 1).padStart(3, '0')}`
           const img = p.thumbnail || p.images?.[0]
           const isHov = hoveredIdx === i
 
           return (
             <button
               key={p.id}
-              onClick={() => onSelect(p, refNum)}
+              onClick={() => onSelect(p)}
               onMouseEnter={() => setHoveredIdx(i)}
               onMouseLeave={() => setHoveredIdx(null)}
               style={{

@@ -1,15 +1,16 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import ViewmasterDisc from '@/components/ViewmasterDisc'
 import GridView from '@/components/GridView'
-import ProjectModal, { ModalState } from '@/components/ProjectModal'
 import { Project } from '@/lib/supabase'
+import { slugify } from '@/lib/slugify'
 
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([])
   const [isGrid, setIsGrid] = useState(false)
-  const [modal, setModal] = useState<ModalState>({ open: false })
+  const router = useRouter()
 
   useEffect(() => {
     fetch('/api/projects')
@@ -18,19 +19,13 @@ export default function Home() {
       .catch(console.error)
   }, [])
 
-  const openProject = useCallback((project: Project) => {
-    const idx = projects.findIndex(p => p.id === project.id)
-    const refNum = `P${String(idx + 1).padStart(3, '0')}`
-    setModal({ open: true, project, refNum, originX: window.innerWidth / 2, originY: window.innerHeight / 2 })
-  }, [projects])
-
-  const closeProject = useCallback(() => {
-    setModal({ open: false })
-  }, [])
+  const openProject = (project: Project) => {
+    router.push('/' + slugify(project.label))
+  }
 
   return (
     <main className="relative w-full h-screen overflow-hidden" style={{ background: '#ffffff' }}>
-      {/* Galaxy */}
+      {/* Disc */}
       <div
         className="absolute inset-0 transition-opacity duration-500"
         style={{ opacity: isGrid ? 0 : 1, pointerEvents: isGrid ? 'none' : 'auto' }}
@@ -38,17 +33,12 @@ export default function Home() {
         <ViewmasterDisc projects={projects} onSelect={openProject} />
       </div>
 
-      {/* Grid */}
+      {/* List */}
       <div
         className="absolute inset-0 transition-opacity duration-500"
         style={{ opacity: isGrid ? 1 : 0, pointerEvents: isGrid ? 'auto' : 'none' }}
       >
-        <GridView
-          projects={projects}
-          onSelect={(p, refNum) => {
-            setModal({ open: true, project: p, refNum, originX: 0, originY: 0 })
-          }}
-        />
+        <GridView projects={projects} onSelect={openProject} />
       </div>
 
       {/* Toggle — icon pill */}
@@ -62,7 +52,6 @@ export default function Home() {
           gap: 0,
         }}
       >
-        {/* Sliding indicator */}
         <div style={{
           position: 'absolute',
           top: 4, left: 4,
@@ -74,7 +63,6 @@ export default function Home() {
           pointerEvents: 'none',
         }} />
 
-        {/* Disc icon */}
         <button
           onClick={() => setIsGrid(false)}
           style={{ width: 36, height: 36, borderRadius: '50%', border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 4 }}
@@ -86,7 +74,6 @@ export default function Home() {
           </svg>
         </button>
 
-        {/* List icon */}
         <button
           onClick={() => setIsGrid(true)}
           style={{ width: 36, height: 36, borderRadius: '50%', border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -99,9 +86,6 @@ export default function Home() {
           </svg>
         </button>
       </div>
-
-      {/* Project modal */}
-      <ProjectModal state={modal} onClose={closeProject} />
     </main>
   )
 }
