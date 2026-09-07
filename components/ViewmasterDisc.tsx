@@ -170,9 +170,9 @@ export default function ViewmasterDisc({
         >
           {/* White base */}
           <circle cx={CX} cy={CY} r={DISC_R} fill={DISC_COLOR} mask="url(#discMask)" />
-          {/* Real paper texture — multiply blend so it tints the white base naturally */}
+          {/* Real paper texture — multiply blend so fibres show through naturally */}
           <circle cx={CX} cy={CY} r={DISC_R} fill="url(#paperTexture)" mask="url(#discMask)"
-            style={{ mixBlendMode: 'multiply', opacity: 0.45 }} />
+            style={{ mixBlendMode: 'multiply', opacity: 0.82 }} />
 
           {/* Light flash — only rendered after first spin to avoid yellow-on-load */}
           {flashKey > 0 && (
@@ -222,13 +222,15 @@ export default function ViewmasterDisc({
             )
           })}
 
-          {/* Notches */}
+          {/* Notches — cut out (white = page background shows through) */}
           {notches.map((n, i) => (
             <g key={i} transform={n.transform}>
+              {/* Depth shadow around the hole */}
+              <rect x="-13" y="-28" width="26" height="56" rx="7"
+                fill="rgba(0,0,0,0.18)" />
+              {/* The hole itself — white matches page background */}
               <rect x="-12" y="-27" width="24" height="54" rx="6"
-                transform="translate(1,2)" fill="rgba(0,0,0,0.10)" />
-              <rect x="-12" y="-27" width="24" height="54" rx="6"
-                fill={DISC_COLOR} stroke="#c8c4bc" strokeWidth="0.8" />
+                fill="#ffffff" />
             </g>
           ))}
 
