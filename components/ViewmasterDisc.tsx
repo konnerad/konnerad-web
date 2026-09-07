@@ -32,7 +32,6 @@ export default function ViewmasterDisc({
 }) {
   const [selected, setSelected] = useState(0)
   const [discRotation, setDiscRotation] = useState(0)
-  const [flashKey, setFlashKey] = useState(0)
   const [shadowLifted, setShadowLifted] = useState(false)
   const rotRef = useRef(0)
   const spinTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -74,8 +73,6 @@ export default function ViewmasterDisc({
     setDiscRotation(next)
     setSelected(idx)
 
-    // Light flash through the frame hole + shadow lift
-    setFlashKey(k => k + 1)
     setShadowLifted(true)
     if (spinTimer.current) clearTimeout(spinTimer.current)
     spinTimer.current = setTimeout(() => setShadowLifted(false), 300)
@@ -166,17 +163,6 @@ export default function ViewmasterDisc({
         >
           {/* Disc surface — base colour + grain filter applied together, no external image */}
           <circle cx={CX} cy={CY} r={DISC_R} fill={DISC_COLOR} filter="url(#vmGrain)" mask="url(#discMask)" />
-
-          {/* Light flash — only rendered after first spin to avoid yellow-on-load */}
-          {flashKey > 0 && (
-            <circle
-              key={flashKey}
-              cx={CX} cy={CY} r={DISC_R}
-              fill="#fffbe8"
-              mask="url(#discMask)"
-              style={{ animation: 'discFlash 0.28s ease-out forwards' }}
-            />
-          )}
 
           {/* Frames */}
           {windows.map((w) => {
