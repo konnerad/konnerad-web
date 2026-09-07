@@ -133,19 +133,32 @@ export default function ViewmasterDisc({
           ))}
         </defs>
 
-        {/* Cast shadow — bottom-right, lifts on spin */}
-        <ellipse
-          cx={CX + 50}
-          cy={CY + DISC_R - 5}
-          rx={DISC_R * 0.80}
-          ry={34}
-          fill="rgba(0,0,0,1)"
-          filter="url(#shadowBlur)"
-          style={{
-            opacity: shadowLifted ? 0.06 : 0.20,
-            transition: 'opacity 0.25s ease',
-          }}
-        />
+        {/*
+          Split shadow — simulates Viewmaster frame-advance:
+          at rest: one wide shadow centered below-right
+          spinning: splits to left and right wings, then merges back
+        */}
+        <g style={{ transition: 'opacity 0.30s ease', opacity: shadowLifted ? 0 : 1 }}>
+          {/* Resting shadow */}
+          <ellipse cx={CX + 35} cy={CY + DISC_R - 8} rx={DISC_R * 0.74} ry={32}
+            fill="black" filter="url(#shadowBlur)" opacity={0.20} />
+        </g>
+        <g style={{ transition: 'opacity 0.30s ease', opacity: shadowLifted ? 1 : 0 }}>
+          {/* Left wing */}
+          <ellipse
+            cx={CX} cy={CY + DISC_R - 8}
+            rx={DISC_R * 0.36} ry={20}
+            fill="black" filter="url(#shadowBlur)" opacity={0.13}
+            style={{ transform: `translateX(${shadowLifted ? '-200px' : '0'})`, transition: 'transform 0.32s cubic-bezier(0.4,0,0.2,1)' }}
+          />
+          {/* Right wing */}
+          <ellipse
+            cx={CX} cy={CY + DISC_R - 8}
+            rx={DISC_R * 0.36} ry={20}
+            fill="black" filter="url(#shadowBlur)" opacity={0.13}
+            style={{ transform: `translateX(${shadowLifted ? '200px' : '0'})`, transition: 'transform 0.32s cubic-bezier(0.4,0,0.2,1)' }}
+          />
+        </g>
 
         {/* ── Rotating disc ── */}
         <g
@@ -161,14 +174,16 @@ export default function ViewmasterDisc({
           <circle cx={CX} cy={CY} r={DISC_R} fill="url(#paperTexture)" mask="url(#discMask)"
             style={{ mixBlendMode: 'multiply', opacity: 0.45 }} />
 
-          {/* Light flash through frame hole — fires on each spin */}
-          <circle
-            key={flashKey}
-            cx={CX} cy={CY} r={DISC_R}
-            fill="#fffbe8"
-            mask="url(#discMask)"
-            style={{ animation: flashKey > 0 ? 'discFlash 0.28s ease-out forwards' : 'none' }}
-          />
+          {/* Light flash — only rendered after first spin to avoid yellow-on-load */}
+          {flashKey > 0 && (
+            <circle
+              key={flashKey}
+              cx={CX} cy={CY} r={DISC_R}
+              fill="#fffbe8"
+              mask="url(#discMask)"
+              style={{ animation: 'discFlash 0.28s ease-out forwards' }}
+            />
+          )}
 
           {/* Frames */}
           {windows.map((w) => {
