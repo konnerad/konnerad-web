@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Project } from '@/lib/supabase'
+import { slugify } from '@/lib/slugify'
 
 const F = "'Helvetica Neue', Helvetica, Arial, sans-serif"
 
@@ -10,7 +11,42 @@ function isVideo(url: string) {
   return /\.(mp4|mov|webm|m4v|avi)(\?|$)/i.test(url)
 }
 
-export default function ProjectPage({ project, refNum }: { project: Project; refNum: string }) {
+export default function ProjectPage({ slug }: { slug: string }) {
+  const [project, setProject] = useState<Project | null>(null)
+  const [refNum, setRefNum] = useState('')
+  const [notFound, setNotFound] = useState(false)
+
+  useEffect(() => {
+    fetch('/api/projects')
+      .then(r => r.json())
+      .then((projects: Project[]) => {
+        const idx = projects.findIndex(p => slugify(p.label) === slug)
+        if (idx === -1) { setNotFound(true); return }
+        setProject(projects[idx])
+        setRefNum(`P${String(idx + 1).padStart(3, '0')}`)
+      })
+      .catch(() => setNotFound(true))
+  }, [slug])
+
+  if (notFound) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: F, gap: 16 }}>
+        <span style={{ fontSize: 13, color: 'rgba(0,0,0,0.4)', letterSpacing: '0.1em' }}>Project not found</span>
+        <Link href="/" style={{ fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.4)', textDecoration: 'none' }}>
+          ← Back
+        </Link>
+      </div>
+    )
+  }
+
+  if (!project) {
+    return <div style={{ minHeight: '100vh', background: '#F4F4F4' }} />
+  }
+
+  return <ProjectDetail project={project} refNum={refNum} />
+}
+
+function ProjectDetail({ project, refNum }: { project: Project; refNum: string }) {
   const [imgIndex, setImgIndex] = useState(0)
   const images = project.images ?? []
   const imgCount = images.length || 1
@@ -41,7 +77,6 @@ export default function ProjectPage({ project, refNum }: { project: Project; ref
 
       {/* Desktop two-column */}
       <div className="hidden md:grid" style={{ gridTemplateColumns: '1fr 1fr', minHeight: '100vh' }}>
-        {/* Text column */}
         <div style={{ padding: '100px 60px 60px', borderRight: border, display: 'flex', flexDirection: 'column' }}>
           <span style={{ fontSize: '9px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.35)', marginBottom: 20 }}>
             {refNum} — {project.tag}
@@ -68,13 +103,12 @@ export default function ProjectPage({ project, refNum }: { project: Project; ref
           </div>
         </div>
 
-        {/* Gallery column */}
         <div style={{ position: 'sticky', top: 0, height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', background: '#ebebeb' }}>
           <Gallery images={images} imgIndex={imgIndex} setImgIndex={setImgIndex} imgCount={imgCount} project={project} />
         </div>
       </div>
 
-      {/* Mobile single column */}
+      {/* Mobile */}
       <div className="flex flex-col md:hidden" style={{ paddingTop: '72px', paddingBottom: '72px' }}>
         <div style={{ padding: '0 24px 24px' }}>
           <p style={{ fontSize: '9px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.35)', marginBottom: 10 }}>
