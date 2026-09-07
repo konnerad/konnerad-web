@@ -12,7 +12,7 @@ export default function GridView({
   onSelect: (project: Project, refNum: string) => void
 }) {
   return (
-    <div className="absolute inset-0 overflow-y-auto" style={{ paddingTop: '52px', paddingBottom: '80px', background: '#F4F4F4' }}>
+    <div className="absolute inset-0 overflow-y-auto" style={{ paddingTop: '52px', paddingBottom: '80px', background: '#ffffff' }}>
       <div style={{ maxWidth: '960px', margin: '0 auto', padding: '0 40px' }}>
         <div
           style={{
@@ -34,7 +34,7 @@ export default function GridView({
                 style={{
                   borderRight: '0.5px solid rgba(0,0,0,0.15)',
                   borderBottom: '0.5px solid rgba(0,0,0,0.15)',
-                  background: '#F4F4F4',
+                  background: '#ffffff',
                 }}
               >
                 {/* Reference number — same horizontal padding as image */}

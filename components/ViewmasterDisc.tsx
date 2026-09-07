@@ -15,8 +15,8 @@ const FRAME_H = 105
 const STEP = 360 / N
 const VIEWER_R = 118
 const F = "'Helvetica Neue', Helvetica, Arial, sans-serif"
-// Flat eggshell/cardboard-white — uniform across the whole disc
-const DISC_COLOR = '#e9e7e2'
+// White — background is now #fff so cutout triangles will show through
+const DISC_COLOR = '#f6f5f1'
 
 function clockToXY(clockDeg: number, r: number) {
   const rad = (clockDeg * Math.PI) / 180
@@ -32,7 +32,8 @@ export default function ViewmasterDisc({
 }) {
   const [selected, setSelected] = useState(0)
   const [discRotation, setDiscRotation] = useState(0)
-  const [spinning, setSpinning] = useState(false)
+  const [flashKey, setFlashKey] = useState(0)
+  const [shadowLifted, setShadowLifted] = useState(false)
   const rotRef = useRef(0)
   const spinTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -73,36 +74,55 @@ export default function ViewmasterDisc({
     setDiscRotation(next)
     setSelected(idx)
 
-    // Shadow flicker: lift then settle
-    setSpinning(true)
+    // Light flash through the frame hole + shadow lift
+    setFlashKey(k => k + 1)
+    setShadowLifted(true)
     if (spinTimer.current) clearTimeout(spinTimer.current)
-    spinTimer.current = setTimeout(() => setSpinning(false), 700)
+    spinTimer.current = setTimeout(() => setShadowLifted(false), 300)
   }
 
   const viewerProject = projects[selected / 2] ?? null
   const viewerImg = viewerProject ? (viewerProject.thumbnail || viewerProject.images?.[0]) : null
 
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <svg viewBox="0 0 840 920" style={{ width: 'min(88vw, 580px)', height: 'auto', display: 'block', overflow: 'visible' }}>
+    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', touchAction: 'manipulation' }}>
+      <svg
+        viewBox="0 0 840 920"
+        style={{ width: 'min(88vw, 580px)', height: 'auto', display: 'block', overflow: 'visible', touchAction: 'manipulation' }}
+      >
         <defs>
-          {/* Paper grain — very subtle, uniform */}
+          {/* Subtle paper grain */}
           <filter id="vmGrain" x="-2%" y="-2%" width="104%" height="104%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.68 0.72" numOctaves="4" seed="5" result="noise" />
+            <feTurbulence type="fractalNoise" baseFrequency="0.65 0.70" numOctaves="4" seed="5" result="noise" />
             <feColorMatrix in="noise" type="matrix"
-              values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.07 0"
+              values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.06 0"
               result="noiseA" />
             <feComposite in="noiseA" in2="SourceGraphic" operator="in" />
           </filter>
 
-          {/* Blur for the cast shadow ellipse */}
+          {/* Blur for cast shadow */}
           <filter id="shadowBlur" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation="22" />
+            <feGaussianBlur stdDeviation="20" />
           </filter>
 
-          <clipPath id="discClip">
-            <circle cx={CX} cy={CY} r={DISC_R} />
-          </clipPath>
+          {/* Disc mask: punches transparent triangle holes at the top */}
+          <mask id="discMask">
+            <circle cx={CX} cy={CY} r={DISC_R} fill="white" />
+            {/* Black = transparent hole — left V-cut */}
+            <g transform="translate(363.2,16.0) rotate(-8)">
+              <polygon points="0,18 34,-16 -34,-16" fill="black" />
+            </g>
+            {/* Black = transparent hole — right V-cut */}
+            <g transform="translate(476.8,16.0) rotate(8)">
+              <polygon points="0,18 34,-16 -34,-16" fill="black" />
+            </g>
+          </mask>
+
+          {/* Paper texture pattern — tiles the real texture image over the disc */}
+          <pattern id="paperTexture" patternUnits="userSpaceOnUse" width="600" height="600" x={CX - 300} y={CY - 300}>
+            <image href="/paper-texture.jpg" x="0" y="0" width="600" height="600" preserveAspectRatio="xMidYMid slice" />
+          </pattern>
+
           <clipPath id="viewerClip">
             <circle cx="0" cy="0" r={VIEWER_R} />
           </clipPath>
@@ -113,17 +133,17 @@ export default function ViewmasterDisc({
           ))}
         </defs>
 
-        {/* ── Cast shadow on surface — bottom-right, flickers on spin ── */}
+        {/* Cast shadow — bottom-right, lifts on spin */}
         <ellipse
-          cx={CX + 55}
-          cy={CY + DISC_R - 10}
-          rx={DISC_R * 0.82}
-          ry={38}
+          cx={CX + 50}
+          cy={CY + DISC_R - 5}
+          rx={DISC_R * 0.80}
+          ry={34}
           fill="rgba(0,0,0,1)"
           filter="url(#shadowBlur)"
           style={{
-            opacity: spinning ? 0.10 : 0.22,
-            transition: 'opacity 0.65s ease',
+            opacity: shadowLifted ? 0.06 : 0.20,
+            transition: 'opacity 0.25s ease',
           }}
         />
 
@@ -135,10 +155,20 @@ export default function ViewmasterDisc({
             transition: 'transform 0.65s cubic-bezier(0.4,0,0.2,1)',
           }}
         >
-          {/* Flat eggshell body */}
-          <circle cx={CX} cy={CY} r={DISC_R} fill={DISC_COLOR} />
-          {/* Paper grain */}
-          <circle cx={CX} cy={CY} r={DISC_R} fill="#aaa" filter="url(#vmGrain)" />
+          {/* White base */}
+          <circle cx={CX} cy={CY} r={DISC_R} fill={DISC_COLOR} mask="url(#discMask)" />
+          {/* Real paper texture — multiply blend so it tints the white base naturally */}
+          <circle cx={CX} cy={CY} r={DISC_R} fill="url(#paperTexture)" mask="url(#discMask)"
+            style={{ mixBlendMode: 'multiply', opacity: 0.45 }} />
+
+          {/* Light flash through frame hole — fires on each spin */}
+          <circle
+            key={flashKey}
+            cx={CX} cy={CY} r={DISC_R}
+            fill="#fffbe8"
+            mask="url(#discMask)"
+            style={{ animation: flashKey > 0 ? 'discFlash 0.28s ease-out forwards' : 'none' }}
+          />
 
           {/* Frames */}
           {windows.map((w) => {
@@ -153,13 +183,12 @@ export default function ViewmasterDisc({
                 style={{ cursor: isPrimary && project ? 'pointer' : 'default' }}
                 transform={w.transform}
                 onClick={() => selectFrame(w.idx)}
+                onTouchEnd={(e) => { e.preventDefault(); selectFrame(w.idx) }}
               >
-                {/* Drop shadow */}
                 <rect x={-FRAME_W / 2} y={-FRAME_H / 2} width={FRAME_W} height={FRAME_H} rx="20"
-                  transform="translate(1.5,2.5)" fill="rgba(0,0,0,0.16)" />
-                {/* Frame */}
+                  transform="translate(1.5,2.5)" fill="rgba(0,0,0,0.14)" />
                 <rect x={-FRAME_W / 2} y={-FRAME_H / 2} width={FRAME_W} height={FRAME_H} rx="20"
-                  fill={imgUrl ? '#111' : '#d8d4cc'} stroke="#c8c4bc" strokeWidth="0.8" />
+                  fill={imgUrl ? '#111' : '#d8d5ce'} stroke="#c8c4bc" strokeWidth="0.8" />
                 {imgUrl && (
                   <image
                     href={imgUrl}
@@ -182,7 +211,7 @@ export default function ViewmasterDisc({
           {notches.map((n, i) => (
             <g key={i} transform={n.transform}>
               <rect x="-12" y="-27" width="24" height="54" rx="6"
-                transform="translate(1,2)" fill="rgba(0,0,0,0.12)" />
+                transform="translate(1,2)" fill="rgba(0,0,0,0.10)" />
               <rect x="-12" y="-27" width="24" height="54" rx="6"
                 fill={DISC_COLOR} stroke="#c8c4bc" strokeWidth="0.8" />
             </g>
@@ -201,18 +230,6 @@ export default function ViewmasterDisc({
           {/* Centre hole */}
           <circle cx={CX} cy={CY} r="9" fill="#d4d0c8" stroke="#bbb8b0" strokeWidth="1" />
 
-          {/* ── Black V-cuts flanking the top notch ── */}
-          <g clipPath="url(#discClip)">
-            {/* Left black triangle */}
-            <g transform="translate(363.2,16.0) rotate(-8)">
-              <polygon points="0,14 28,-14 -28,-14" fill="#1a1a1a" />
-            </g>
-            {/* Right black triangle */}
-            <g transform="translate(476.8,16.0) rotate(8)">
-              <polygon points="0,14 28,-14 -28,-14" fill="#1a1a1a" />
-            </g>
-          </g>
-
           {/* "UP FOR VIEWER" */}
           <g transform={`translate(${CX},${CY - 178})`}>
             <text x="0" y="0" textAnchor="middle"
@@ -222,11 +239,12 @@ export default function ViewmasterDisc({
           </g>
         </g>
 
-        {/* ── Fixed center viewer (non-rotating) ── */}
+        {/* ── Fixed center viewer ── */}
         <g
           transform={`translate(${CX},${CY})`}
           style={{ cursor: viewerProject ? 'pointer' : 'default' }}
           onClick={() => { if (viewerProject) onSelect(viewerProject) }}
+          onTouchEnd={(e) => { e.preventDefault(); if (viewerProject) onSelect(viewerProject) }}
         >
           {viewerImg ? (
             <image

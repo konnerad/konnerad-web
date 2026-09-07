@@ -29,7 +29,7 @@ export default function Home() {
   }, [])
 
   return (
-    <main className="relative w-full h-screen overflow-hidden" style={{ background: '#F4F4F4' }}>
+    <main className="relative w-full h-screen overflow-hidden" style={{ background: '#ffffff' }}>
       {/* Galaxy */}
       <div
         className="absolute inset-0 transition-opacity duration-500"
