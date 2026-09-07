@@ -14,6 +14,7 @@ const FRAME_W = 84
 const FRAME_H = 105
 const STEP = 360 / N
 const VIEWER_R = 118
+const F = "'Helvetica Neue', Helvetica, Arial, sans-serif"
 
 function clockToXY(clockDeg: number, r: number) {
   const rad = (clockDeg * Math.PI) / 180
@@ -27,7 +28,7 @@ export default function ViewmasterDisc({
   projects: Project[]
   onSelect: (project: Project) => void
 }) {
-  const [selected, setSelected] = useState(0)       // idx of selected window
+  const [selected, setSelected] = useState(0)
   const [discRotation, setDiscRotation] = useState(0)
   const rotRef = useRef(0)
 
@@ -61,14 +62,14 @@ export default function ViewmasterDisc({
   }, [])
 
   function selectFrame(idx: number) {
-    if (idx % 2 !== 0) return               // only primary frames
+    if (idx % 2 !== 0) return
     const projectIdx = idx / 2
-    if (!projects[projectIdx]) return        // no project in this slot
+    if (!projects[projectIdx]) return
 
     const clockDeg = idx * STEP - STEP / 2
     const targetRot = -clockDeg
     const current = rotRef.current
-    let delta = ((targetRot - current) % 360 + 540) % 360 - 180
+    const delta = ((targetRot - current) % 360 + 540) % 360 - 180
     const next = current + delta
     rotRef.current = next
     setDiscRotation(next)
@@ -83,49 +84,31 @@ export default function ViewmasterDisc({
       width: '100%', height: '100%',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
-      <div style={{ filter: 'drop-shadow(0 28px 52px rgba(0,0,0,0.22))' }}>
-        <svg viewBox="0 0 840 840" style={{ width: 'min(88vw, 580px)', height: 'auto', display: 'block' }}>
+      {/* Outer drop-shadow on the disc */}
+      <div style={{ filter: 'drop-shadow(0 12px 32px rgba(0,0,0,0.28)) drop-shadow(0 4px 8px rgba(0,0,0,0.14))' }}>
+        <svg viewBox="0 0 840 900" style={{ width: 'min(88vw, 580px)', height: 'auto', display: 'block' }}>
           <defs>
-            {/* ── Cardboard texture ── */}
-            <radialGradient id="vmBase" cx="44%" cy="38%" r="68%">
-              <stop offset="0%"   stopColor="#f0e4c0" />
-              <stop offset="55%"  stopColor="#dfd0a0" />
-              <stop offset="100%" stopColor="#c9b882" />
+            {/* Off-white base — slightly warm, like matte paper */}
+            <radialGradient id="vmBase" cx="42%" cy="36%" r="72%">
+              <stop offset="0%"   stopColor="#faf8f3" />
+              <stop offset="60%"  stopColor="#f4f1ea" />
+              <stop offset="100%" stopColor="#ece7dc" />
             </radialGradient>
 
-            {/* Horizontal fibre grain — the key to that cardboard feel */}
-            <filter id="vmFibre" x="-5%" y="-5%" width="110%" height="110%">
-              {/* coarse horizontal fibres */}
-              <feTurbulence type="fractalNoise" baseFrequency="0.018 0.38" numOctaves="4" seed="3" result="fibre" />
-              <feColorMatrix in="fibre" type="matrix"
-                values="0 0 0 0 0.18
-                        0 0 0 0 0.13
-                        0 0 0 0 0.05
-                        0 0 0 0.55 0"
-                result="fibreColored" />
-              <feComposite in="fibreColored" in2="SourceGraphic" operator="in" result="clipped" />
-              {/* fine surface speckle */}
-              <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7" result="speckle" />
-              <feColorMatrix in="speckle" type="matrix"
-                values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.18 0"
-                result="speckleA" />
-              <feComposite in="speckleA" in2="SourceGraphic" operator="in" result="clippedSpeckle" />
-              <feMerge>
-                <feMergeNode in="clipped" />
-                <feMergeNode in="clippedSpeckle" />
-              </feMerge>
+            {/* Very subtle paper grain — barely perceptible */}
+            <filter id="vmGrain" x="-2%" y="-2%" width="104%" height="104%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="3" seed="12" result="noise" />
+              <feColorMatrix in="noise" type="matrix"
+                values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.09 0"
+                result="noiseA" />
+              <feComposite in="noiseA" in2="SourceGraphic" operator="in" />
             </filter>
 
-            {/* Vignette — darker rim, like worn cardboard edges */}
-            <radialGradient id="vmVignette" cx="50%" cy="50%" r="50%">
-              <stop offset="60%"  stopColor="transparent" />
-              <stop offset="100%" stopColor="#2a1e0a" stopOpacity="0.28" />
+            {/* Soft edge shadow to give the disc physical depth */}
+            <radialGradient id="vmEdge" cx="50%" cy="50%" r="50%">
+              <stop offset="72%"  stopColor="transparent" />
+              <stop offset="100%" stopColor="#000" stopOpacity="0.10" />
             </radialGradient>
-
-            <linearGradient id="vmBezel" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#332419" />
-              <stop offset="100%" stopColor="#1c130c" />
-            </linearGradient>
 
             <clipPath id="discClip">
               <circle cx={CX} cy={CY} r={DISC_R} />
@@ -135,12 +118,13 @@ export default function ViewmasterDisc({
             </clipPath>
             {windows.map(w => (
               <clipPath key={`clip-${w.idx}`} id={`frameClip-${w.idx}`}>
-                <rect x={-FRAME_W / 2 + 3} y={-FRAME_H / 2 + 3} width={FRAME_W - 6} height={FRAME_H - 6} rx="18" />
+                <rect x={-FRAME_W / 2 + 3} y={-FRAME_H / 2 + 3}
+                  width={FRAME_W - 6} height={FRAME_H - 6} rx="18" />
               </clipPath>
             ))}
           </defs>
 
-          {/* ── Rotating disc group ── */}
+          {/* ── Rotating disc ── */}
           <g
             style={{
               transform: `rotate(${discRotation}deg)`,
@@ -148,16 +132,12 @@ export default function ViewmasterDisc({
               transition: 'transform 0.65s cubic-bezier(0.4,0,0.2,1)',
             }}
           >
-            {/* Cardboard body */}
+            {/* Base colour */}
             <circle cx={CX} cy={CY} r={DISC_R} fill="url(#vmBase)" />
-            {/* Fibre + speckle texture */}
-            <circle cx={CX} cy={CY} r={DISC_R} fill="#c8a96e" filter="url(#vmFibre)" />
-            {/* Edge vignette */}
-            <circle cx={CX} cy={CY} r={DISC_R} fill="url(#vmVignette)" />
-
-            {/* Printed lines (like real reels have faint offset lines) */}
-            <line x1="404" y1="352" x2="428" y2="452" stroke="#9c8c62" strokeWidth="1.4" opacity="0.3" />
-            <line x1="416" y1="358" x2="399" y2="440" stroke="#9c8c62" strokeWidth="1" opacity="0.2" />
+            {/* Paper grain overlay */}
+            <circle cx={CX} cy={CY} r={DISC_R} fill="#888" filter="url(#vmGrain)" opacity={1} />
+            {/* Edge darkening for physical feel */}
+            <circle cx={CX} cy={CY} r={DISC_R} fill="url(#vmEdge)" />
 
             {/* Frames */}
             {windows.map((w) => {
@@ -173,10 +153,12 @@ export default function ViewmasterDisc({
                   transform={w.transform}
                   onClick={() => selectFrame(w.idx)}
                 >
-                  <rect x={-FRAME_W / 2} y={-FRAME_H / 2} width={FRAME_W} height={FRAME_H} rx="22"
-                    transform="translate(2,3)" fill="#00000022" />
-                  <rect x={-FRAME_W / 2} y={-FRAME_H / 2} width={FRAME_W} height={FRAME_H} rx="22"
-                    fill="#f8f3e4" stroke="#c9b98c" strokeWidth="1.5" />
+                  {/* Subtle frame shadow */}
+                  <rect x={-FRAME_W / 2} y={-FRAME_H / 2} width={FRAME_W} height={FRAME_H} rx="20"
+                    transform="translate(1.5,2.5)" fill="rgba(0,0,0,0.14)" />
+                  {/* Frame body — slightly darker than disc so it reads as a cutout */}
+                  <rect x={-FRAME_W / 2} y={-FRAME_H / 2} width={FRAME_W} height={FRAME_H} rx="20"
+                    fill={imgUrl ? '#111' : '#e8e4da'} stroke="#d0cbc0" strokeWidth="1" />
                   {imgUrl && (
                     <image
                       href={imgUrl}
@@ -186,10 +168,11 @@ export default function ViewmasterDisc({
                       clipPath={`url(#frameClip-${w.idx})`}
                     />
                   )}
+                  {/* Selection ring */}
                   {isSelected && (
-                    <rect x={-FRAME_W / 2 - 7} y={-FRAME_H / 2 - 7}
-                      width={FRAME_W + 14} height={FRAME_H + 14} rx="25"
-                      fill="none" stroke="#ffd23f" strokeWidth="4" />
+                    <rect x={-FRAME_W / 2 - 6} y={-FRAME_H / 2 - 6}
+                      width={FRAME_W + 12} height={FRAME_H + 12} rx="24"
+                      fill="none" stroke="#ffd23f" strokeWidth="3.5" />
                   )}
                 </g>
               )
@@ -199,9 +182,9 @@ export default function ViewmasterDisc({
             {notches.map((n, i) => (
               <g key={i} transform={n.transform}>
                 <rect x="-12" y="-27" width="24" height="54" rx="6"
-                  transform="translate(1,2)" fill="#00000018" />
+                  transform="translate(1,2)" fill="rgba(0,0,0,0.12)" />
                 <rect x="-12" y="-27" width="24" height="54" rx="6"
-                  fill="#f8f3e4" stroke="#c9b98c" strokeWidth="1.5" />
+                  fill="#e8e4da" stroke="#d0cbc0" strokeWidth="1" />
               </g>
             ))}
 
@@ -209,43 +192,37 @@ export default function ViewmasterDisc({
             {numbers.map((nu, i) => (
               <g key={i} transform={nu.transform}>
                 <text x="0" y="7" textAnchor="middle"
-                  fontFamily="'Helvetica Neue', Helvetica, Arial, sans-serif"
-                  fontWeight="700" fontSize="19" fill="#4a3a24">
+                  fontFamily={F} fontWeight="600" fontSize="18" fill="#888880">
                   {nu.n}
                 </text>
               </g>
             ))}
 
-            {/* Center hole */}
-            <circle cx={CX} cy={CY} r="9" fill="#e9ddc0" stroke="#9c8c62" strokeWidth="1.5" />
+            {/* Centre hole */}
+            <circle cx={CX} cy={CY} r="8" fill="#ddd9d0" stroke="#c8c4bc" strokeWidth="1" />
 
-            {/* Start marker V-cuts */}
+            {/* Start marker — triangle at 12 o'clock */}
             <g clipPath="url(#discClip)">
-              <g transform="translate(363.2,16.0) rotate(-8)">
-                <polygon points="0,14 28,-14 -28,-14" fill="#f8f3e4" stroke="#c9b98c" strokeWidth="1.5" />
-              </g>
-              <g transform="translate(476.8,16.0) rotate(8)">
-                <polygon points="0,14 28,-14 -28,-14" fill="#f8f3e4" stroke="#c9b98c" strokeWidth="1.5" />
+              <g transform={`translate(${CX},${CY - DISC_R + 10})`}>
+                <polygon points="0,-10 10,8 -10,8" fill="#b0aba0" />
               </g>
             </g>
 
-            {/* "UP FOR PROJECTOR" stamp */}
-            <g transform="translate(505,585) rotate(180)">
+            {/* "UP FOR VIEWER" text */}
+            <g transform={`translate(${CX},${CY - 178})`}>
               <text x="0" y="0" textAnchor="middle"
-                fontFamily="'Helvetica Neue', Helvetica, Arial, sans-serif"
-                fontWeight="600" fontSize="10.5" letterSpacing="0.5" fill="#4a3a24">
-                UP FOR PROJECTOR
+                fontFamily={F} fontWeight="500" fontSize="10" letterSpacing="1.2" fill="#999890">
+                UP FOR VIEWER
               </text>
             </g>
           </g>
 
-          {/* ── Fixed center viewer (not rotating) ── */}
+          {/* ── Fixed center viewer ── */}
           <g
             transform={`translate(${CX},${CY})`}
             style={{ cursor: viewerProject ? 'pointer' : 'default' }}
             onClick={() => { if (viewerProject) onSelect(viewerProject) }}
           >
-            {/* Circle viewer — no border/bezel */}
             {viewerImg ? (
               <image
                 href={viewerImg}
@@ -255,19 +232,19 @@ export default function ViewmasterDisc({
                 clipPath="url(#viewerClip)"
               />
             ) : (
-              <circle cx="0" cy="0" r={VIEWER_R} fill="#ddd" opacity="0.4" />
+              <circle cx="0" cy="0" r={VIEWER_R} fill="#e0ddd6" />
             )}
 
-            {/* Project label — 3× bigger, below the circle */}
+            {/* Project name below viewer */}
             {viewerProject && (
               <text
-                x="0" y={VIEWER_R + 48}
+                x="0" y={VIEWER_R + 36}
                 textAnchor="middle"
-                fontFamily="'Helvetica Neue', Helvetica, Arial, sans-serif"
-                fontSize="33"
+                fontFamily={F}
+                fontSize="20"
                 fontWeight="300"
-                letterSpacing="0.04em"
-                fill="#2a1e0a"
+                letterSpacing="0.06em"
+                fill="#333"
               >
                 {viewerProject.label}
               </text>
