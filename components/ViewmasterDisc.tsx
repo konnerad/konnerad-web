@@ -170,9 +170,8 @@ export default function ViewmasterDisc({
         >
           {/* White base */}
           <circle cx={CX} cy={CY} r={DISC_R} fill={DISC_COLOR} mask="url(#discMask)" />
-          {/* Real paper texture — multiply blend so fibres show through naturally */}
-          <circle cx={CX} cy={CY} r={DISC_R} fill="url(#paperTexture)" mask="url(#discMask)"
-            style={{ mixBlendMode: 'multiply', opacity: 0.82 }} />
+          {/* Paper texture — plain opacity overlay (no mix-blend-mode: iOS Safari doesn't support it on SVG) */}
+          <circle cx={CX} cy={CY} r={DISC_R} fill="url(#paperTexture)" mask="url(#discMask)" opacity={0.55} />
 
           {/* Light flash — only rendered after first spin to avoid yellow-on-load */}
           {flashKey > 0 && (
