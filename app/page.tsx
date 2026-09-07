@@ -56,7 +56,6 @@ export default function Home() {
         className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10"
         style={{
           display: 'flex',
-          position: 'relative',
           background: 'rgba(0,0,0,0.06)',
           borderRadius: 999,
           padding: 4,
