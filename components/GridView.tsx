@@ -36,8 +36,8 @@ export default function GridView({
     : `${THUMB}px 2fr 1.2fr 1.2fr 80px`
 
   const headers = isMobile
-    ? ['', 'Title', 'Year']
-    : ['', 'Title', 'Kind', 'Client', 'Year']
+    ? ['Image', 'Title', 'Year']
+    : ['Image', 'Title', 'Kind', 'Client', 'Year']
 
   return (
     <div className="absolute inset-0 overflow-y-auto" style={{ background: '#ffffff', fontFamily: F }}>

@@ -91,13 +91,16 @@ export default function ViewmasterDisc({
         style={{ width: 'min(88vw, 580px)', height: 'auto', display: 'block', overflow: 'visible', touchAction: 'manipulation' }}
       >
         <defs>
-          {/* Subtle paper grain */}
+          {/*
+            Paper grain — uses soft-light blend so the noise darkens/lightens the base
+            colour naturally. feComposite clips back to the disc shape at the end.
+            Works on iOS Safari, Android Chrome, and all desktop browsers.
+          */}
           <filter id="vmGrain" x="-2%" y="-2%" width="104%" height="104%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.65 0.70" numOctaves="4" seed="5" result="noise" />
-            <feColorMatrix in="noise" type="matrix"
-              values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.06 0"
-              result="noiseA" />
-            <feComposite in="noiseA" in2="SourceGraphic" operator="in" />
+            <feTurbulence type="fractalNoise" baseFrequency="0.60 0.65" numOctaves="4" seed="5" result="noise" />
+            <feColorMatrix in="noise" type="saturate" values="0" result="grayNoise" />
+            <feBlend in="SourceGraphic" in2="grayNoise" mode="soft-light" result="blended" />
+            <feComposite in="blended" in2="SourceGraphic" operator="in" />
           </filter>
 
           {/* Blur for cast shadow */}
@@ -117,11 +120,6 @@ export default function ViewmasterDisc({
               <polygon points="0,18 34,-16 -34,-16" fill="black" />
             </g>
           </mask>
-
-          {/* Paper texture pattern — tiles the real texture image over the disc */}
-          <pattern id="paperTexture" patternUnits="userSpaceOnUse" width="600" height="600" x={CX - 300} y={CY - 300}>
-            <image href="/paper-texture.jpg" x="0" y="0" width="600" height="600" preserveAspectRatio="xMidYMid slice" />
-          </pattern>
 
           <clipPath id="viewerClip">
             <circle cx="0" cy="0" r={VIEWER_R} />
@@ -168,10 +166,8 @@ export default function ViewmasterDisc({
             transition: 'transform 0.65s cubic-bezier(0.4,0,0.2,1)',
           }}
         >
-          {/* White base */}
-          <circle cx={CX} cy={CY} r={DISC_R} fill={DISC_COLOR} mask="url(#discMask)" />
-          {/* Paper texture — plain opacity overlay (no mix-blend-mode: iOS Safari doesn't support it on SVG) */}
-          <circle cx={CX} cy={CY} r={DISC_R} fill="url(#paperTexture)" mask="url(#discMask)" opacity={0.55} />
+          {/* Disc surface — base colour + grain filter applied together, no external image */}
+          <circle cx={CX} cy={CY} r={DISC_R} fill={DISC_COLOR} filter="url(#vmGrain)" mask="url(#discMask)" />
 
           {/* Light flash — only rendered after first spin to avoid yellow-on-load */}
           {flashKey > 0 && (
