@@ -62,7 +62,7 @@ export default function Home() {
           color: 'rgba(0,0,0,0.6)',
         }}
       >
-        {isGrid ? 'Disc View' : 'Grid View'}
+        {isGrid ? 'Disc View' : 'List View'}
       </button>
 
       {/* Project modal */}
