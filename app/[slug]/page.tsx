@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
 export default async function Page({ params }: { params: { slug: string } }) {
   const supabase = createServiceClient()
-  const { data } = await supabase.from('projects').select('*').order('order', { ascending: true })
+  const { data } = await supabase.from('projects').select('*').order('order_index', { ascending: true })
   const projects = data ?? []
   const project = projects.find(p => slugify(p.label) === params.slug)
   if (!project) notFound()
