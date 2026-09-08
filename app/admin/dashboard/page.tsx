@@ -17,6 +17,30 @@ const emptyForm = (): FormData => ({
   tag: '', client: '', description: '',
 })
 
+const MAX_PX = 1800
+const QUALITY = 0.82
+
+function resizeImage(file: File): Promise<File> {
+  if (!file.type.startsWith('image/')) return Promise.resolve(file)
+  return new Promise((resolve) => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      URL.revokeObjectURL(url)
+      const scale = Math.min(1, MAX_PX / Math.max(img.width, img.height))
+      const w = Math.round(img.width * scale)
+      const h = Math.round(img.height * scale)
+      const canvas = document.createElement('canvas')
+      canvas.width = w; canvas.height = h
+      canvas.getContext('2d')!.drawImage(img, 0, 0, w, h)
+      canvas.toBlob(blob => {
+        resolve(blob ? new File([blob], file.name.replace(/\.\w+$/, '.webp'), { type: 'image/webp' }) : file)
+      }, 'image/webp', QUALITY)
+    }
+    img.src = url
+  })
+}
+
 export default function Dashboard() {
   const [projects, setProjects] = useState<Project[]>([])
   const [form, setForm] = useState<FormData>(emptyForm())
@@ -58,8 +82,9 @@ export default function Dashboard() {
 
   async function uploadImage(file: File) {
     setUploading(true)
+    const resized = await resizeImage(file)
     const fd = new FormData()
-    fd.append('file', file)
+    fd.append('file', resized)
     const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
     const { url, error } = await res.json()
     if (error) alert(error)
@@ -69,8 +94,9 @@ export default function Dashboard() {
 
   async function uploadThumbnail(file: File) {
     setUploadingThumb(true)
+    const resized = await resizeImage(file)
     const fd = new FormData()
-    fd.append('file', file)
+    fd.append('file', resized)
     const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
     const { url, error } = await res.json()
     if (error) alert(error)
