@@ -24,9 +24,9 @@ export default function GridView({
   }, [])
 
   const THUMB = isMobile ? 48 : 64
-  const TITLE_SIZE = isMobile ? '13px' : '19px'
-  const META_SIZE = isMobile ? '11px' : '18px'
-  const HEAD_SIZE = isMobile ? '9px' : '13px'
+  const TITLE_SIZE = isMobile ? '15px' : '18px'
+  const META_SIZE = isMobile ? '15px' : '18px'
+  const HEAD_SIZE = isMobile ? '11px' : '13px'
   const PAD = isMobile ? '0 12px 80px' : '0 20px 80px'
 
   // Mobile: thumbnail + title + year only
