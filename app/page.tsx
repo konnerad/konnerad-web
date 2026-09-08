@@ -16,13 +16,16 @@ export default function Home() {
   const router = useRouter()
 
   useEffect(() => {
-    const saved = sessionStorage.getItem('viewMode')
-    if (saved === 'list') setIsGrid(true)
+    // Only restore view when returning from a project page, not on fresh load
+    const returnView = sessionStorage.getItem('returnView')
+    if (returnView) {
+      sessionStorage.removeItem('returnView')
+      setIsGrid(returnView === 'list')
+    }
   }, [])
 
   const setView = (grid: boolean) => {
     setIsGrid(grid)
-    sessionStorage.setItem('viewMode', grid ? 'list' : 'disc')
   }
 
   useEffect(() => {
@@ -33,6 +36,7 @@ export default function Home() {
   }, [])
 
   const openProject = (project: Project) => {
+    sessionStorage.setItem('returnView', isGrid ? 'list' : 'disc')
     router.push('/' + slugify(project.label))
   }
 
