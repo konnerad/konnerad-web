@@ -61,7 +61,16 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
   }, [prev, next])
 
   const metaRef = useRef<HTMLDivElement>(null)
+  const [atBottom, setAtBottom] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setAtBottom(window.scrollY > 80)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   const scrollToMeta = () => metaRef.current?.scrollIntoView({ behavior: 'smooth' })
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 
   const metaFields = [
     { label: 'Year',   value: project.year         },
@@ -141,26 +150,26 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
             →
           </button>
 
-          {/* Scroll-down button */}
-          <button
-            onClick={scrollToMeta}
-            title="See details"
-            style={{
-              position: 'absolute', right: 0,
-              width: 30, height: 30, borderRadius: '50%',
-              border: '1px solid rgba(0,0,0,0.25)',
-              background: 'none', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: 'rgba(0,0,0,0.45)', fontSize: 13, lineHeight: 1,
-              transition: 'border-color 0.15s, color 0.15s',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.7)'; e.currentTarget.style.color = '#111' }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.25)'; e.currentTarget.style.color = 'rgba(0,0,0,0.45)' }}
-          >
-            ↓
-          </button>
         </div>
       </div>
+
+      {/* Fixed scroll toggle — bottom right */}
+      <button
+        onClick={atBottom ? scrollToTop : scrollToMeta}
+        style={{
+          position: 'fixed', bottom: 28, right: 32, zIndex: 50,
+          width: 36, height: 36, borderRadius: '50%',
+          border: '1px solid rgba(0,0,0,0.25)',
+          background: '#fff', cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: 'rgba(0,0,0,0.45)', fontSize: 14, lineHeight: 1,
+          transition: 'border-color 0.15s, color 0.15s',
+        }}
+        onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.7)'; e.currentTarget.style.color = '#111' }}
+        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.25)'; e.currentTarget.style.color = 'rgba(0,0,0,0.45)' }}
+      >
+        {atBottom ? '↑' : '↓'}
+      </button>
 
       {/* Metadata — revealed by scrolling */}
       <div ref={metaRef} style={{ padding: `48px ${SIDE} 100px` }}>
