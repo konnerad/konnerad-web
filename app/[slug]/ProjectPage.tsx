@@ -72,18 +72,15 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
   return (
     <div style={{ minHeight: '100vh', background: '#fff', fontFamily: F, color: '#111' }}>
 
-      {/* Nav */}
+      {/* Nav — favicon centered, no borders */}
       <nav style={{
         height: NAV_H,
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        display: 'flex', justifyContent: 'center', alignItems: 'center',
         padding: `0 32px`,
-        borderBottom: '0.5px solid rgba(0,0,0,0.1)',
       }}>
-        <Link href="/" style={{ fontSize: 13, color: '#111', textDecoration: 'none', letterSpacing: '-0.01em' }}>
-          Konnerad
-        </Link>
-        <Link href="/" style={{ fontSize: 13, color: '#111', textDecoration: 'none' }}>
-          ← Projects
+        <Link href="/" style={{ display: 'flex', alignItems: 'center' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/favicon-32x32.png" alt="Konnerad" style={{ width: 24, height: 24, display: 'block' }} />
         </Link>
       </nav>
 
@@ -136,53 +133,47 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
       </div>
 
       {/* Metadata — revealed by scrolling */}
-      <div style={{ borderTop: '0.5px solid rgba(0,0,0,0.12)', padding: `40px ${SIDE} 80px` }}>
+      <div style={{ padding: `48px ${SIDE} 100px` }}>
 
         {/* Desktop: two columns */}
         <div className="hidden md:grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '0 80px' }}>
           <div>
-            <p style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.35)', marginBottom: 16 }}>
-              {refNum}
-            </p>
-            <h1 style={{ fontSize: 'clamp(24px,3vw,40px)', fontWeight: 300, lineHeight: 1.15, marginBottom: 32, letterSpacing: '-0.01em' }}>
+            <h1 style={{ fontSize: 'clamp(28px,3vw,44px)', fontWeight: 400, lineHeight: 1.15, marginBottom: 28, letterSpacing: '-0.01em' }}>
               {project.label}
             </h1>
             {project.description && (
-              <p style={{ fontSize: 13, lineHeight: 1.85, color: 'rgba(0,0,0,0.6)', maxWidth: '52ch' }}>
+              <p style={{ fontSize: 16, lineHeight: 1.75, color: 'rgba(0,0,0,0.65)', maxWidth: '48ch' }}>
                 {project.description}
               </p>
             )}
           </div>
-          <div style={{ paddingTop: 4 }}>
+          <div style={{ paddingTop: 6 }}>
             {metaFields.map(({ label, value }) => (
-              <div key={label} style={{ marginBottom: 24 }}>
-                <p style={{ fontSize: 12, fontWeight: 600, marginBottom: 4 }}>{label}</p>
-                <p style={{ fontSize: 13, color: 'rgba(0,0,0,0.55)', lineHeight: 1.6 }}>{value}</p>
+              <div key={label} style={{ marginBottom: 28 }}>
+                <p style={{ fontSize: 16, fontWeight: 700, marginBottom: 4 }}>{label}</p>
+                <p style={{ fontSize: 16, color: 'rgba(0,0,0,0.55)', lineHeight: 1.5 }}>{value}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* Mobile: single column */}
-        <div className="flex flex-col md:hidden" style={{ gap: 28 }}>
+        <div className="flex flex-col md:hidden" style={{ gap: 32 }}>
           <div>
-            <p style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.35)', marginBottom: 12 }}>
-              {refNum}
-            </p>
-            <h1 style={{ fontSize: 24, fontWeight: 300, lineHeight: 1.2, marginBottom: 20 }}>
+            <h1 style={{ fontSize: 26, fontWeight: 400, lineHeight: 1.2, marginBottom: 20 }}>
               {project.label}
             </h1>
             {project.description && (
-              <p style={{ fontSize: 13, lineHeight: 1.85, color: 'rgba(0,0,0,0.6)' }}>
+              <p style={{ fontSize: 15, lineHeight: 1.75, color: 'rgba(0,0,0,0.65)' }}>
                 {project.description}
               </p>
             )}
           </div>
-          <div style={{ borderTop: '0.5px solid rgba(0,0,0,0.1)', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             {metaFields.map(({ label, value }) => (
               <div key={label}>
-                <p style={{ fontSize: 11, fontWeight: 600, marginBottom: 3 }}>{label}</p>
-                <p style={{ fontSize: 13, color: 'rgba(0,0,0,0.55)' }}>{value}</p>
+                <p style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{label}</p>
+                <p style={{ fontSize: 15, color: 'rgba(0,0,0,0.55)' }}>{value}</p>
               </div>
             ))}
           </div>
