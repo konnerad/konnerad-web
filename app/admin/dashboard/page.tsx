@@ -88,14 +88,31 @@ export default function Dashboard() {
 
   async function uploadImage(file: File) {
     setUploading(true)
-    const resized = await resizeImage(file)
-    const fd = new FormData()
-    fd.append('file', resized)
-    const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
-    const { url, error } = await res.json()
-    if (error) alert(error)
-    else setImages(prev => [...prev, url])
-    setUploading(false)
+    try {
+      if (file.type.startsWith('video/')) {
+        // Videos go directly to Supabase via signed URL — avoids Vercel 4.5MB body limit
+        const { signedUrl, publicUrl, error: urlError } = await fetch('/api/admin/upload-url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: file.name, contentType: file.type }),
+        }).then(r => r.json())
+        if (urlError) { alert(urlError); return }
+        const res = await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } })
+        if (!res.ok) { alert('Upload failed'); return }
+        setImages(prev => [...prev, publicUrl])
+      } else {
+        // Images: resize client-side then proxy through API
+        const resized = await resizeImage(file)
+        const fd = new FormData()
+        fd.append('file', resized)
+        const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
+        const { url, error } = await res.json()
+        if (error) alert(error)
+        else setImages(prev => [...prev, url])
+      }
+    } finally {
+      setUploading(false)
+    }
   }
 
   async function uploadThumbnail(file: File) {
