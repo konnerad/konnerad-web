@@ -53,6 +53,7 @@ export default function Dashboard() {
   const [saving, setSaving] = useState(false)
   const [panel, setPanel] = useState<'list' | 'edit'>('list')
   const [dragIdx, setDragIdx] = useState<number | null>(null)
+  const [projDragIdx, setProjDragIdx] = useState<number | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const thumbRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
@@ -120,6 +121,18 @@ export default function Dashboard() {
     setSaving(false)
   }
 
+  async function reorderProjects(from: number, to: number) {
+    const next = [...projects]
+    const [moved] = next.splice(from, 1)
+    next.splice(to, 0, moved)
+    setProjects(next)
+    await fetch('/api/admin/projects', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ order: next.map((p, i) => ({ id: p.id, order_index: i })) }),
+    })
+  }
+
   async function deleteProject(id: string) {
     if (!confirm('Delete this project?')) return
     await fetch('/api/admin/projects', {
@@ -181,14 +194,25 @@ export default function Dashboard() {
             </div>
 
             <div className="flex flex-col gap-2">
-              {projects.map(p => (
+              {projects.map((p, i) => (
                 <div
                   key={p.id}
+                  draggable
+                  onDragStart={() => setProjDragIdx(i)}
+                  onDragEnd={() => setProjDragIdx(null)}
+                  onDragOver={e => e.preventDefault()}
+                  onDrop={e => { e.preventDefault(); if (projDragIdx !== null && projDragIdx !== i) reorderProjects(projDragIdx, i); setProjDragIdx(null) }}
                   className="flex items-center justify-between px-4 py-3 rounded-sm"
-                  style={{ background: 'rgba(0,0,0,0.03)', border: '0.5px solid rgba(232,228,220,0.07)' }}
+                  style={{
+                    background: 'rgba(0,0,0,0.03)',
+                    border: '0.5px solid rgba(232,228,220,0.07)',
+                    opacity: projDragIdx === i ? 0.4 : 1,
+                    cursor: 'grab',
+                    transition: 'opacity 0.15s',
+                  }}
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-3 h-3 rounded-full shrink-0" style={{ background: p.color }} />
+                    <span style={{ color: 'rgba(0,0,0,0.2)', fontSize: 14, lineHeight: 1, userSelect: 'none' }}>⠿</span>
                     <div>
                       <p className="text-[12px]">{p.label}</p>
                       <p className="text-[10px] mt-0.5" style={{ color: 'rgba(0,0,0,0.35)' }}>{p.year} · {p.tag} · {p.images?.length ?? 0} images</p>
@@ -198,14 +222,14 @@ export default function Dashboard() {
                     <button
                       onClick={() => startEdit(p)}
                       className="text-[10px] tracking-wider uppercase"
-                      style={{ color: 'rgba(0,0,0,0.45)' }}
+                      style={{ color: 'rgba(0,0,0,0.45)', cursor: 'pointer' }}
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => deleteProject(p.id)}
                       className="text-[10px] tracking-wider uppercase"
-                      style={{ color: '#D85A30' }}
+                      style={{ color: '#D85A30', cursor: 'pointer' }}
                     >
                       Delete
                     </button>

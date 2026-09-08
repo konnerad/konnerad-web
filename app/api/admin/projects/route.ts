@@ -41,6 +41,21 @@ export async function PUT(req: NextRequest) {
   return NextResponse.json(data)
 }
 
+export async function PATCH(req: NextRequest) {
+  const denied = await guard(); if (denied) return denied
+  const { order } = await req.json() as { order: { id: string; order_index: number }[] }
+  const supabase = createServiceClient()
+
+  const results = await Promise.all(
+    order.map(({ id, order_index }) =>
+      supabase.from('projects').update({ order_index }).eq('id', id)
+    )
+  )
+  const failed = results.find(r => r.error)
+  if (failed?.error) return NextResponse.json({ error: failed.error.message }, { status: 500 })
+  return NextResponse.json({ ok: true })
+}
+
 export async function DELETE(req: NextRequest) {
   const denied = await guard(); if (denied) return denied
   const { id } = await req.json()
