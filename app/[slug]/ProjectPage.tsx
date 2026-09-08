@@ -168,12 +168,25 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           padding: 0, transition: 'background 0.15s, border-color 0.15s',
         }}
-        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.75)'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.75)'; (e.currentTarget.querySelector('span') as HTMLElement).style.color = '#fff' }}
-        onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.3)'; (e.currentTarget.querySelector('span') as HTMLElement).style.color = 'rgba(0,0,0,0.5)' }}
+        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.75)'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.75)'; (e.currentTarget.querySelector('svg') as SVGElement).style.stroke = '#fff' }}
+        onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.3)'; (e.currentTarget.querySelector('svg') as SVGElement).style.stroke = 'rgba(0,0,0,0.5)' }}
       >
-        <span style={{ fontSize: 16, color: 'rgba(0,0,0,0.5)', lineHeight: 1, transition: 'color 0.15s', userSelect: 'none' }}>
-          {atBottom ? '↑' : '↓'}
-        </span>
+        <svg width="14" height="18" viewBox="0 0 14 18" fill="none"
+          style={{ stroke: 'rgba(0,0,0,0.5)', transition: 'stroke 0.15s', display: 'block', overflow: 'visible' }}>
+          {atBottom ? (
+            /* Up arrow — tip at top */
+            <>
+              <line x1="7" y1="17" x2="7" y2="3" strokeWidth="1.8" strokeLinecap="round"/>
+              <polyline points="1,9 7,3 13,9" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+            </>
+          ) : (
+            /* Down arrow — tip at bottom */
+            <>
+              <line x1="7" y1="1" x2="7" y2="15" strokeWidth="1.8" strokeLinecap="round"/>
+              <polyline points="1,9 7,15 13,9" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+            </>
+          )}
+        </svg>
       </button>
 
       {/* Metadata — revealed by scrolling */}
