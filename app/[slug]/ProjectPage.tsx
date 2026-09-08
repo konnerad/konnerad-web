@@ -158,17 +158,22 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
         onClick={atBottom ? scrollToTop : scrollToMeta}
         style={{
           position: 'fixed', bottom: 28, right: 32, zIndex: 50,
-          width: 36, height: 36, borderRadius: '50%',
-          border: '1px solid rgba(0,0,0,0.25)',
+          width: 44, height: 44, borderRadius: '50%',
+          border: '1.5px solid rgba(0,0,0,0.3)',
           background: '#fff', cursor: 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: 'rgba(0,0,0,0.45)', fontSize: 14, lineHeight: 1,
-          transition: 'border-color 0.15s, color 0.15s',
+          transition: 'border-color 0.15s',
         }}
-        onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.7)'; e.currentTarget.style.color = '#111' }}
-        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.25)'; e.currentTarget.style.color = 'rgba(0,0,0,0.45)' }}
+        onMouseEnter={e => { e.currentTarget.style.borderColor = '#111' }}
+        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.3)' }}
       >
-        {atBottom ? '↑' : '↓'}
+        <svg width="14" height="18" viewBox="0 0 14 18" fill="none"
+          style={{ transform: atBottom ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
+          {/* stem */}
+          <rect x="5.5" y="0" width="3" height="12" fill="rgba(0,0,0,0.55)" rx="1" />
+          {/* arrowhead */}
+          <polygon points="0,9 7,18 14,9" fill="rgba(0,0,0,0.55)" />
+        </svg>
       </button>
 
       {/* Metadata — revealed by scrolling */}
@@ -176,7 +181,7 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
 
         {/* Desktop: two equal columns filling the padded container */}
         <div className="hidden md:flex" style={{ gap: 80 }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ flex: 1, minWidth: 0, maxWidth: 350 }}>
             <h1 style={{ fontSize: 16, fontWeight: 700, lineHeight: 1.5, marginBottom: 4 }}>
               {project.label}
             </h1>
@@ -186,7 +191,7 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
               </p>
             )}
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ flex: 1, minWidth: 0, maxWidth: 350 }}>
             {metaFields.map(({ label, value }) => (
               <div key={label} style={{ marginBottom: 28 }}>
                 <p style={{ fontSize: 16, fontWeight: 700, marginBottom: 4 }}>{label}</p>
