@@ -230,7 +230,7 @@ export default function ViewmasterDisc({
           <g transform={`translate(${CX},${CY - 178})`}>
             <text x="0" y="0" textAnchor="middle"
               fontFamily={F} fontWeight="500" fontSize="10" letterSpacing="1.5" fill="#9a9690">
-              UP FOR VIEWER
+              PROJECTS
             </text>
           </g>
         </g>

@@ -10,6 +10,16 @@ import { slugify } from '@/lib/slugify'
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([])
   const [isGrid, setIsGrid] = useState(false)
+
+  useEffect(() => {
+    const saved = sessionStorage.getItem('viewMode')
+    if (saved === 'list') setIsGrid(true)
+  }, [])
+
+  const setView = (grid: boolean) => {
+    setIsGrid(grid)
+    sessionStorage.setItem('viewMode', grid ? 'list' : 'disc')
+  }
   const router = useRouter()
 
   useEffect(() => {
@@ -64,9 +74,9 @@ export default function Home() {
         }} />
 
         <button
-          onClick={() => setIsGrid(false)}
+          onClick={() => setView(false)}
           style={{ width: 36, height: 36, borderRadius: '50%', border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 4 }}
-          title="Disc view"
+          title="disc"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <circle cx="8" cy="8" r="6.5" stroke={isGrid ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.75)'} strokeWidth="1.5" />
@@ -75,9 +85,9 @@ export default function Home() {
         </button>
 
         <button
-          onClick={() => setIsGrid(true)}
+          onClick={() => setView(true)}
           style={{ width: 36, height: 36, borderRadius: '50%', border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          title="List view"
+          title="list"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             {[4, 8, 12].map(y => (

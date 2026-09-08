@@ -84,16 +84,20 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
   return (
     <div style={{ minHeight: '100vh', background: '#fff', fontFamily: F, color: '#111' }}>
 
-      {/* Nav — favicon centered, no borders */}
+      {/* Nav — About left, favicon center */}
       <nav style={{
         height: NAV_H,
-        display: 'flex', justifyContent: 'center', alignItems: 'center',
-        padding: `0 32px`,
+        display: 'grid', gridTemplateColumns: '1fr auto 1fr',
+        alignItems: 'center', padding: `0 32px`,
       }}>
-        <Link href="/" style={{ display: 'flex', alignItems: 'center' }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/favicon-32x32.png" alt="Konnerad" style={{ width: 24, height: 24, display: 'block' }} />
+        <Link href="/about" style={{ fontSize: 13, color: '#111', textDecoration: 'none' }}>
+          About
         </Link>
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/apple-touch-icon.png" alt="Konnerad" style={{ width: 28, height: 28, display: 'block', borderRadius: 4 }} />
+        </Link>
+        <div />
       </nav>
 
       {/* Gallery — fills exactly the remaining viewport height */}
@@ -167,21 +171,19 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
         onMouseEnter={e => { e.currentTarget.style.borderColor = '#111' }}
         onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.3)' }}
       >
-        <svg width="14" height="18" viewBox="0 0 14 18" fill="none"
+        <svg width="11" height="17" viewBox="0 0 11 17" fill="none"
           style={{ transform: atBottom ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
-          {/* stem */}
-          <rect x="5.5" y="0" width="3" height="12" fill="rgba(0,0,0,0.55)" rx="1" />
-          {/* arrowhead */}
-          <polygon points="0,9 7,18 14,9" fill="rgba(0,0,0,0.55)" />
+          <line x1="5.5" y1="0" x2="5.5" y2="13" stroke="rgba(0,0,0,0.6)" strokeWidth="2.2" strokeLinecap="round"/>
+          <polyline points="1,9 5.5,14.5 10,9" stroke="rgba(0,0,0,0.6)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
         </svg>
       </button>
 
       {/* Metadata — revealed by scrolling */}
       <div ref={metaRef} style={{ padding: `48px ${SIDE} 100px` }}>
 
-        {/* Desktop: two equal columns filling the padded container */}
-        <div className="hidden md:flex" style={{ gap: 80 }}>
-          <div style={{ flex: 1, minWidth: 0, maxWidth: 350 }}>
+        {/* Desktop: two fixed-width columns centered on page */}
+        <div className="hidden md:flex" style={{ gap: 80, justifyContent: 'center' }}>
+          <div style={{ width: 350, flexShrink: 0 }}>
             <h1 style={{ fontSize: 16, fontWeight: 700, lineHeight: 1.5, marginBottom: 4 }}>
               {project.label}
             </h1>
@@ -191,7 +193,7 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
               </p>
             )}
           </div>
-          <div style={{ flex: 1, minWidth: 0, maxWidth: 350 }}>
+          <div style={{ width: 350, flexShrink: 0 }}>
             {metaFields.map(({ label, value }) => (
               <div key={label} style={{ marginBottom: 28 }}>
                 <p style={{ fontSize: 16, fontWeight: 700, marginBottom: 4 }}>{label}</p>
