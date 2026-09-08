@@ -186,11 +186,11 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
         {/* Desktop: 3-col grid — columns flank the same gap as the counter display above */}
         <div className="hidden md:grid" style={{ gridTemplateColumns: '1fr 90px 1fr' }}>
           <div style={{ paddingRight: 5 }}>
-            <h1 style={{ fontSize: 18, fontWeight: 700, lineHeight: 1.5, marginBottom: 4 }}>
+            <h1 style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.5, marginBottom: 4 }}>
               {project.label}
             </h1>
             {project.description && (
-              <p style={{ fontSize: 18, lineHeight: 1.75, color: 'rgba(0,0,0,0.65)' }}>
+              <p style={{ fontSize: 14, lineHeight: 1.75, color: 'rgba(0,0,0,0.65)' }}>
                 {project.description}
               </p>
             )}
@@ -199,8 +199,8 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
           <div style={{ paddingLeft: 5 }}>
             {metaFields.map(({ label, value }) => (
               <div key={label} style={{ marginBottom: 28 }}>
-                <p style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>{label}</p>
-                <p style={{ fontSize: 18, color: 'rgba(0,0,0,0.55)', lineHeight: 1.5 }}>{value}</p>
+                <p style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>{label}</p>
+                <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.55)', lineHeight: 1.5 }}>{value}</p>
               </div>
             ))}
           </div>
@@ -209,11 +209,11 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
         {/* Mobile: single column */}
         <div className="flex flex-col md:hidden" style={{ gap: 24 }}>
           <div>
-            <h1 style={{ fontSize: 18, fontWeight: 700, lineHeight: 1.5, marginBottom: 4 }}>
+            <h1 style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.5, marginBottom: 4 }}>
               {project.label}
             </h1>
             {project.description && (
-              <p style={{ fontSize: 18, lineHeight: 1.75, color: 'rgba(0,0,0,0.65)' }}>
+              <p style={{ fontSize: 14, lineHeight: 1.75, color: 'rgba(0,0,0,0.65)' }}>
                 {project.description}
               </p>
             )}
@@ -221,8 +221,8 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             {metaFields.map(({ label, value }) => (
               <div key={label}>
-                <p style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>{label}</p>
-                <p style={{ fontSize: 18, color: 'rgba(0,0,0,0.55)' }}>{value}</p>
+                <p style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>{label}</p>
+                <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.55)' }}>{value}</p>
               </div>
             ))}
           </div>
