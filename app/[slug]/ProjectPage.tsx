@@ -153,8 +153,8 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
             <div style={{ position: 'absolute', inset: 0, background: project.color ?? '#eee', opacity: 0.25 }} />
           )}
 
-          {/* Click zones for prev/next */}
-          {imgCount > 1 && (
+          {/* Click zones for prev/next — hidden for YouTube so the iframe is interactive */}
+          {imgCount > 1 && !youtubeId(images[imgIndex]) && (
             <>
               <button onClick={prev} disabled={imgIndex === 0}
                 style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '50%', background: 'none', border: 'none', cursor: imgIndex === 0 ? 'default' : 'w-resize', zIndex: 2 }} />
