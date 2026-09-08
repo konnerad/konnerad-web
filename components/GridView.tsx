@@ -88,16 +88,16 @@ export default function GridView({
               }}
             >
               {/* Thumbnail */}
-              <div style={{ width: THUMB, height: THUMB, flexShrink: 0, overflow: 'hidden', background: '#f0eeeb' }}>
+              <div style={{ width: THUMB, height: THUMB, flexShrink: 0, overflow: 'hidden', background: '#fff', border: '0.5px solid rgba(0,0,0,0.06)' }}>
                 {img ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={img} alt={p.label} style={{
-                    width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                    width: '100%', height: '100%', objectFit: 'contain', display: 'block',
                     transform: isHov ? 'scale(1.06)' : 'scale(1)',
                     transition: 'transform 0.4s ease',
                   }} />
                 ) : (
-                  <div style={{ width: '100%', height: '100%', background: p.color, opacity: 0.3 }} />
+                  <div style={{ width: '100%', height: '100%', background: '#f0eeeb' }} />
                 )}
               </div>
 
@@ -108,20 +108,20 @@ export default function GridView({
 
               {/* Kind — desktop only */}
               {!isMobile && (
-                <span style={{ fontSize: META_SIZE, color: 'rgba(0,0,0,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <span style={{ fontSize: META_SIZE, color: '#111', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {p.tag || '—'}
                 </span>
               )}
 
               {/* Client — desktop only */}
               {!isMobile && (
-                <span style={{ fontSize: META_SIZE, color: 'rgba(0,0,0,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <span style={{ fontSize: META_SIZE, color: '#111', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {p.client || '—'}
                 </span>
               )}
 
               {/* Year */}
-              <span style={{ fontSize: META_SIZE, color: 'rgba(0,0,0,0.4)', whiteSpace: 'nowrap' }}>
+              <span style={{ fontSize: META_SIZE, color: '#111', whiteSpace: 'nowrap' }}>
                 {p.year || '—'}
               </span>
             </button>
