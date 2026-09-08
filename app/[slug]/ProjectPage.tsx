@@ -157,30 +157,32 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
         </div>
       </div>
 
-      {/* Fixed scroll toggle — bottom right, same style as counter arrows */}
+      {/* Fixed scroll toggle — bottom right */}
       <button
         onClick={atBottom ? scrollToTop : scrollToMeta}
         style={{
-          position: 'fixed', bottom: 28, right: 32, zIndex: 50,
-          width: 44, height: 44, borderRadius: '50%',
-          border: '1.5px solid rgba(0,0,0,0.3)',
+          position: 'fixed', bottom: 24, right: 28, zIndex: 50,
+          width: 36, height: 36, borderRadius: '50%',
+          border: '1px solid rgba(0,0,0,0.3)',
           background: '#fff', cursor: 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 20, color: 'rgba(0,0,0,0.5)', lineHeight: 1,
+          padding: 0,
           transition: 'border-color 0.15s, color 0.15s',
         }}
-        onMouseEnter={e => { e.currentTarget.style.borderColor = '#111'; e.currentTarget.style.color = '#111' }}
-        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.3)'; e.currentTarget.style.color = 'rgba(0,0,0,0.5)' }}
+        onMouseEnter={e => { e.currentTarget.style.borderColor = '#111' }}
+        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.3)' }}
       >
-        {atBottom ? '↑' : '↓'}
+        <span style={{ fontSize: 16, color: 'rgba(0,0,0,0.5)', lineHeight: 1, display: 'block', marginTop: atBottom ? '-1px' : '1px' }}>
+          {atBottom ? '↑' : '↓'}
+        </span>
       </button>
 
       {/* Metadata — revealed by scrolling */}
       <div ref={metaRef} style={{ padding: `48px ${SIDE} 100px` }}>
 
-        {/* Desktop: two columns filling the same padded width as the gallery */}
-        <div className="hidden md:flex" style={{ gap: 40 }}>
-          <div style={{ flex: 1, minWidth: 0, paddingLeft: 5 }}>
+        {/* Desktop: 3-col grid — columns flank the same gap as the counter display above */}
+        <div className="hidden md:grid" style={{ gridTemplateColumns: '1fr 90px 1fr' }}>
+          <div style={{ paddingRight: 5 }}>
             <h1 style={{ fontSize: 18, fontWeight: 700, lineHeight: 1.5, marginBottom: 4 }}>
               {project.label}
             </h1>
@@ -190,7 +192,8 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
               </p>
             )}
           </div>
-          <div style={{ flex: 1, minWidth: 0, paddingRight: 5 }}>
+          <div />{/* center gap matching ← 1/n → width */}
+          <div style={{ paddingLeft: 5 }}>
             {metaFields.map(({ label, value }) => (
               <div key={label} style={{ marginBottom: 28 }}>
                 <p style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>{label}</p>
