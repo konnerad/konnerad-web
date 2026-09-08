@@ -185,13 +185,15 @@ export default function ViewmasterDisc({
                   fill={imgUrl ? '#111' : '#d8d5ce'} stroke="#c8c4bc" strokeWidth="0.8" />
                 {imgUrl && (
                   <>
-                    <rect x={-FRAME_W / 2 + 3} y={-FRAME_H / 2 + 3} width={FRAME_W - 6} height={FRAME_H - 6}
-                      fill={DISC_COLOR} clipPath={`url(#frameClip-${w.idx})`} />
+                    {project?.disc_contain && (
+                      <rect x={-FRAME_W / 2 + 3} y={-FRAME_H / 2 + 3} width={FRAME_W - 6} height={FRAME_H - 6}
+                        fill="#ffffff" clipPath={`url(#frameClip-${w.idx})`} />
+                    )}
                     <image
                       href={imgUrl}
                       x={-FRAME_W / 2 + 3} y={-FRAME_H / 2 + 3}
                       width={FRAME_W - 6} height={FRAME_H - 6}
-                      preserveAspectRatio="xMidYMid meet"
+                      preserveAspectRatio={project?.disc_contain ? 'xMidYMid meet' : 'xMidYMid slice'}
                       clipPath={`url(#frameClip-${w.idx})`}
                     />
                   </>
@@ -248,12 +250,14 @@ export default function ViewmasterDisc({
         >
           {viewerImg ? (
             <>
-              <circle cx="0" cy="0" r={VIEWER_R} fill={DISC_COLOR} clipPath="url(#viewerClip)" />
+              {viewerProject?.disc_contain && (
+                <circle cx="0" cy="0" r={VIEWER_R} fill="#ffffff" clipPath="url(#viewerClip)" />
+              )}
               <image
                 href={viewerImg}
                 x={-VIEWER_R} y={-VIEWER_R}
                 width={VIEWER_R * 2} height={VIEWER_R * 2}
-                preserveAspectRatio="xMidYMid meet"
+                preserveAspectRatio={viewerProject?.disc_contain ? 'xMidYMid meet' : 'xMidYMid slice'}
                 clipPath="url(#viewerClip)"
               />
             </>

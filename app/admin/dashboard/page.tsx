@@ -7,6 +7,7 @@ import { Project } from '@/lib/supabase'
 type FormData = {
   label: string
   disc_label: string
+  disc_contain: boolean
   year: string
   tag: string
   client: string
@@ -14,7 +15,8 @@ type FormData = {
 }
 
 const emptyForm = (): FormData => ({
-  label: '', disc_label: '', year: new Date().getFullYear().toString(),
+  label: '', disc_label: '', disc_contain: false,
+  year: new Date().getFullYear().toString(),
   tag: '', client: '', description: '',
 })
 
@@ -76,7 +78,7 @@ export default function Dashboard() {
 
   function startEdit(p: Project) {
     setEditing(p.id)
-    setForm({ label: p.label, disc_label: p.disc_label ?? '', year: p.year, tag: p.tag, client: p.client ?? '', description: p.description })
+    setForm({ label: p.label, disc_label: p.disc_label ?? '', disc_contain: p.disc_contain ?? false, year: p.year, tag: p.tag, client: p.client ?? '', description: p.description })
     setImages(p.images ?? [])
     setThumbnail(p.thumbnail ?? '')
     setPanel('edit')
@@ -275,6 +277,25 @@ export default function Dashboard() {
                   <p className="text-[9px] mt-1" style={{ color: 'rgba(0,0,0,0.2)' }}>
                     {form.disc_label.length}/35 — falls back to Title if left empty
                   </p>
+                </div>
+                <div>
+                  <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(0,0,0,0.35)' }}>Disc frame style</label>
+                  <div className="flex gap-2">
+                    {([false, true] as const).map(val => (
+                      <button
+                        key={String(val)}
+                        onClick={() => setForm(f => ({ ...f, disc_contain: val }))}
+                        className="px-3 py-1.5 text-[10px] tracking-wider uppercase rounded-sm transition-colors"
+                        style={{
+                          background: form.disc_contain === val ? 'rgba(0,0,0,0.15)' : 'rgba(0,0,0,0.03)',
+                          border: `0.5px solid ${form.disc_contain === val ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.1)'}`,
+                          color: form.disc_contain === val ? '#111' : 'rgba(0,0,0,0.45)',
+                        }}
+                      >
+                        {val ? 'Logo / graphic (fit)' : 'Photo (fill frame)'}
+                      </button>
+                    ))}
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>

@@ -4,6 +4,7 @@ export type Project = {
   id: string
   label: string
   disc_label: string
+  disc_contain: boolean
   year: string
   tag: string
   description: string
