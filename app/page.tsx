@@ -2,14 +2,18 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import ViewmasterDisc from '@/components/ViewmasterDisc'
 import GridView from '@/components/GridView'
 import { Project } from '@/lib/supabase'
 import { slugify } from '@/lib/slugify'
 
+const NAV_H = 56
+
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([])
   const [isGrid, setIsGrid] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     const saved = sessionStorage.getItem('viewMode')
@@ -20,7 +24,6 @@ export default function Home() {
     setIsGrid(grid)
     sessionStorage.setItem('viewMode', grid ? 'list' : 'disc')
   }
-  const router = useRouter()
 
   useEffect(() => {
     fetch('/api/projects')
@@ -34,68 +37,72 @@ export default function Home() {
   }
 
   return (
-    <main className="relative w-full h-screen overflow-hidden" style={{ background: '#ffffff' }}>
-      {/* Disc */}
-      <div
-        className="absolute inset-0 transition-opacity duration-500"
-        style={{ opacity: isGrid ? 0 : 1, pointerEvents: isGrid ? 'none' : 'auto' }}
-      >
-        <ViewmasterDisc projects={projects} onSelect={openProject} />
-      </div>
+    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: '#ffffff', overflow: 'hidden' }}>
 
-      {/* List */}
-      <div
-        className="absolute inset-0 transition-opacity duration-500"
-        style={{ opacity: isGrid ? 1 : 0, pointerEvents: isGrid ? 'auto' : 'none' }}
-      >
-        <GridView projects={projects} onSelect={openProject} />
-      </div>
+      {/* Nav */}
+      <nav style={{
+        height: NAV_H, flexShrink: 0,
+        display: 'grid', gridTemplateColumns: '1fr auto 1fr',
+        alignItems: 'center', padding: '0 32px',
+      }}>
+        <Link href="/about" style={{ fontSize: 13, color: '#111', textDecoration: 'none' }}>
+          about
+        </Link>
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/apple-touch-icon.png" alt="Konnerad" style={{ width: 28, height: 28, display: 'block', borderRadius: 4 }} />
+        </Link>
+        <div />
+      </nav>
 
-      {/* Toggle — icon pill */}
-      <div
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10"
-        style={{
-          display: 'flex',
-          background: 'rgba(0,0,0,0.06)',
-          borderRadius: 999,
-          padding: 4,
-          gap: 0,
-        }}
-      >
-        <div style={{
-          position: 'absolute',
-          top: 4, left: 4,
-          width: 36, height: 36,
-          borderRadius: '50%',
-          background: 'rgba(0,0,0,0.13)',
-          transform: `translateX(${isGrid ? 40 : 0}px)`,
-          transition: 'transform 0.45s cubic-bezier(0.34,1.56,0.64,1)',
-          pointerEvents: 'none',
-        }} />
-
-        <button
-          onClick={() => setView(false)}
-          style={{ width: 36, height: 36, borderRadius: '50%', border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 4 }}
-          title="disc"
+      {/* Content area */}
+      <main className="relative overflow-hidden" style={{ flex: 1 }}>
+        {/* Disc */}
+        <div
+          className="absolute inset-0 transition-opacity duration-500"
+          style={{ opacity: isGrid ? 0 : 1, pointerEvents: isGrid ? 'none' : 'auto' }}
         >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <circle cx="8" cy="8" r="6.5" stroke={isGrid ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.75)'} strokeWidth="1.5" />
-            <circle cx="8" cy="8" r="1.5" fill={isGrid ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.75)'} />
-          </svg>
-        </button>
+          <ViewmasterDisc projects={projects} onSelect={openProject} />
+        </div>
 
-        <button
-          onClick={() => setView(true)}
-          style={{ width: 36, height: 36, borderRadius: '50%', border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          title="list"
+        {/* List */}
+        <div
+          className="absolute inset-0 transition-opacity duration-500"
+          style={{ opacity: isGrid ? 1 : 0, pointerEvents: isGrid ? 'auto' : 'none' }}
         >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            {[4, 8, 12].map(y => (
-              <line key={y} x1="2" y1={y} x2="14" y2={y} stroke={isGrid ? 'rgba(0,0,0,0.75)' : 'rgba(0,0,0,0.3)'} strokeWidth="1.5" strokeLinecap="round" />
-            ))}
-          </svg>
-        </button>
-      </div>
-    </main>
+          <GridView projects={projects} onSelect={openProject} />
+        </div>
+
+        {/* Toggle — icon pill */}
+        <div
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10"
+          style={{ display: 'flex', background: 'rgba(0,0,0,0.06)', borderRadius: 999, padding: 4 }}
+        >
+          <div style={{
+            position: 'absolute', top: 4, left: 4,
+            width: 36, height: 36, borderRadius: '50%',
+            background: 'rgba(0,0,0,0.13)',
+            transform: `translateX(${isGrid ? 40 : 0}px)`,
+            transition: 'transform 0.45s cubic-bezier(0.34,1.56,0.64,1)',
+            pointerEvents: 'none',
+          }} />
+          <button onClick={() => setView(false)} title="disc"
+            style={{ width: 36, height: 36, borderRadius: '50%', border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 4 }}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="6.5" stroke={isGrid ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.75)'} strokeWidth="1.5" />
+              <circle cx="8" cy="8" r="1.5" fill={isGrid ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.75)'} />
+            </svg>
+          </button>
+          <button onClick={() => setView(true)} title="list"
+            style={{ width: 36, height: 36, borderRadius: '50%', border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              {[4, 8, 12].map(y => (
+                <line key={y} x1="2" y1={y} x2="14" y2={y} stroke={isGrid ? 'rgba(0,0,0,0.75)' : 'rgba(0,0,0,0.3)'} strokeWidth="1.5" strokeLinecap="round" />
+              ))}
+            </svg>
+          </button>
+        </div>
+      </main>
+    </div>
   )
 }

@@ -91,7 +91,7 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
         alignItems: 'center', padding: `0 32px`,
       }}>
         <Link href="/about" style={{ fontSize: 13, color: '#111', textDecoration: 'none' }}>
-          About
+          about
         </Link>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
