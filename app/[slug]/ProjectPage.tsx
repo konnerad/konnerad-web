@@ -60,6 +60,13 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
     return () => window.removeEventListener('keydown', handler)
   }, [prev, next])
 
+  // Preload all images so flipping through them is instant
+  useEffect(() => {
+    images.forEach(url => {
+      if (!isVideo(url)) { const img = new Image(); img.src = url }
+    })
+  }, [images])
+
   const metaRef = useRef<HTMLDivElement>(null)
   const [atBottom, setAtBottom] = useState(false)
 
@@ -199,7 +206,7 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
               {project.label}
             </h1>
             {project.description && (
-              <p style={{ fontSize: 14, lineHeight: 1.75, color: 'rgba(0,0,0,0.65)' }}>
+              <p style={{ fontSize: 14, lineHeight: 1.75, color: 'rgba(0,0,0,0.65)', whiteSpace: 'pre-wrap' }}>
                 {project.description}
               </p>
             )}
@@ -222,7 +229,7 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
               {project.label}
             </h1>
             {project.description && (
-              <p style={{ fontSize: 14, lineHeight: 1.75, color: 'rgba(0,0,0,0.65)' }}>
+              <p style={{ fontSize: 14, lineHeight: 1.75, color: 'rgba(0,0,0,0.65)', whiteSpace: 'pre-wrap' }}>
                 {project.description}
               </p>
             )}
