@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { Project } from '@/lib/supabase'
 import { slugify } from '@/lib/slugify'
@@ -31,17 +31,13 @@ export default function ProjectPage({ slug }: { slug: string }) {
   if (notFound) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: F, gap: 16 }}>
-        <span style={{ fontSize: 13, color: 'rgba(0,0,0,0.4)', letterSpacing: '0.1em' }}>Project not found</span>
-        <Link href="/" style={{ fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.4)', textDecoration: 'none' }}>
-          ← Back
-        </Link>
+        <span style={{ fontSize: 13, color: 'rgba(0,0,0,0.4)' }}>Project not found</span>
+        <Link href="/" style={{ fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.4)', textDecoration: 'none' }}>← Back</Link>
       </div>
     )
   }
 
-  if (!project) {
-    return <div style={{ minHeight: '100vh', background: '#F4F4F4' }} />
-  }
+  if (!project) return <div style={{ minHeight: '100vh', background: '#fff' }} />
 
   return <ProjectDetail project={project} refNum={refNum} />
 }
@@ -49,127 +45,143 @@ export default function ProjectPage({ slug }: { slug: string }) {
 function ProjectDetail({ project, refNum }: { project: Project; refNum: string }) {
   const [imgIndex, setImgIndex] = useState(0)
   const images = project.images ?? []
-  const imgCount = images.length || 1
-  const border = '0.5px solid rgba(0,0,0,0.1)'
+  const imgCount = Math.max(images.length, 1)
 
-  const metaRows = [
+  const prev = useCallback(() => setImgIndex(i => Math.max(0, i - 1)), [])
+  const next = useCallback(() => setImgIndex(i => Math.min(imgCount - 1, i + 1)), [imgCount])
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') prev()
+      if (e.key === 'ArrowRight') next()
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [prev, next])
+
+  const metaFields = [
     { label: 'Year',   value: project.year         },
     { label: 'Client', value: project.client || '—' },
     { label: 'Type',   value: project.tag    || '—' },
-  ]
+  ].filter(f => f.value && f.value !== '—')
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F4F4F4', fontFamily: F }}>
-      {/* Back */}
-      <Link
-        href="/"
-        style={{
-          position: 'fixed', top: 28, left: 32, zIndex: 10,
-          fontFamily: F, fontSize: '10px', letterSpacing: '0.12em',
-          textTransform: 'uppercase', color: 'rgba(0,0,0,0.4)',
-          textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px',
-        }}
-        onMouseEnter={e => (e.currentTarget.style.color = '#111111')}
-        onMouseLeave={e => (e.currentTarget.style.color = 'rgba(0,0,0,0.4)')}
-      >
-        ← Back
-      </Link>
+    <div style={{ minHeight: '100vh', background: '#fff', fontFamily: F, color: '#111' }}>
 
-      {/* Desktop two-column */}
-      <div className="hidden md:grid" style={{ gridTemplateColumns: '1fr 1fr', minHeight: '100vh' }}>
-        <div style={{ padding: '100px 60px 60px', borderRight: border, display: 'flex', flexDirection: 'column' }}>
-          <span style={{ fontSize: '9px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.35)', marginBottom: 20 }}>
-            {refNum} — {project.tag}
+      {/* Nav */}
+      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 32px', borderBottom: '0.5px solid rgba(0,0,0,0.1)' }}>
+        <Link href="/" style={{ fontFamily: F, fontSize: 13, color: '#111', textDecoration: 'none', letterSpacing: '-0.01em' }}>
+          Konnerad
+        </Link>
+        <Link href="/" style={{ fontFamily: F, fontSize: 13, color: '#111', textDecoration: 'none' }}>
+          ← Projects
+        </Link>
+      </nav>
+
+      {/* Gallery */}
+      <div style={{ position: 'relative', width: '100%', background: '#f0efed' }}>
+        <div style={{ position: 'relative', width: '100%', paddingTop: '62%', overflow: 'hidden' }}>
+          {images.length > 0 ? (
+            isVideo(images[imgIndex]) ? (
+              <video
+                key={imgIndex}
+                src={images[imgIndex]}
+                controls
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }}
+              />
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={imgIndex}
+                src={images[imgIndex]}
+                alt=""
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', animation: 'fadeIn 0.25s ease' }}
+              />
+            )
+          ) : (
+            <div style={{ position: 'absolute', inset: 0, background: project.color ?? '#ddd', opacity: 0.3 }} />
+          )}
+
+          {/* Arrow buttons */}
+          {imgCount > 1 && (
+            <>
+              <button
+                onClick={prev} disabled={imgIndex === 0}
+                style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '50%', background: 'none', border: 'none', cursor: imgIndex === 0 ? 'default' : 'w-resize', zIndex: 2 }}
+              />
+              <button
+                onClick={next} disabled={imgIndex === imgCount - 1}
+                style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '50%', background: 'none', border: 'none', cursor: imgIndex === imgCount - 1 ? 'default' : 'e-resize', zIndex: 2 }}
+              />
+            </>
+          )}
+        </div>
+
+        {/* Counter */}
+        <div style={{ padding: '10px 32px', display: 'flex', justifyContent: 'flex-end' }}>
+          <span style={{ fontSize: 11, color: 'rgba(0,0,0,0.35)', fontFamily: F, letterSpacing: '0.04em' }}>
+            {imgIndex + 1}/{imgCount}
           </span>
-          <h1 style={{ fontSize: 'clamp(32px,4vw,56px)', fontWeight: 300, lineHeight: 1.1, color: '#111111', marginBottom: 10 }}>
-            {project.label}
-          </h1>
-          <span style={{ fontSize: '10px', letterSpacing: '0.15em', color: 'rgba(0,0,0,0.3)', marginBottom: 48 }}>
-            {project.year}
-          </span>
-          <div style={{ width: 32, height: '0.5px', background: 'rgba(0,0,0,0.15)', marginBottom: 32 }} />
-          <p style={{ fontSize: '13px', lineHeight: 1.9, color: 'rgba(0,0,0,0.55)', maxWidth: '42ch', marginBottom: 48 }}>
-            {project.description}
-          </p>
-          <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column' }}>
-            {metaRows.map(({ label, value }) => (
-              <div key={label} style={{ display: 'flex', gap: 16, padding: '12px 0', borderTop: border }}>
-                <span style={{ fontSize: '9px', letterSpacing: '0.16em', textTransform: 'uppercase', width: 64, flexShrink: 0, color: 'rgba(0,0,0,0.3)' }}>
-                  {label}
-                </span>
-                <span style={{ fontSize: '11px', color: 'rgba(0,0,0,0.6)' }}>{value}</span>
+        </div>
+      </div>
+
+      {/* Metadata — two columns desktop, one column mobile */}
+      <div style={{ borderTop: '0.5px solid rgba(0,0,0,0.12)', padding: '40px 32px 80px' }}>
+
+        {/* Desktop: two columns */}
+        <div className="hidden md:grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '0 80px' }}>
+          {/* Left — title + description */}
+          <div>
+            <p style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.35)', marginBottom: 16 }}>
+              {refNum}
+            </p>
+            <h1 style={{ fontSize: 'clamp(24px,3vw,40px)', fontWeight: 300, lineHeight: 1.15, marginBottom: 32, letterSpacing: '-0.01em' }}>
+              {project.label}
+            </h1>
+            {project.description && (
+              <p style={{ fontSize: 13, lineHeight: 1.85, color: 'rgba(0,0,0,0.6)', maxWidth: '52ch' }}>
+                {project.description}
+              </p>
+            )}
+          </div>
+
+          {/* Right — structured fields */}
+          <div style={{ paddingTop: 4 }}>
+            {metaFields.map(({ label, value }) => (
+              <div key={label} style={{ marginBottom: 24 }}>
+                <p style={{ fontSize: 12, fontWeight: 600, marginBottom: 4, letterSpacing: '0.01em' }}>{label}</p>
+                <p style={{ fontSize: 13, color: 'rgba(0,0,0,0.55)', lineHeight: 1.6 }}>{value}</p>
               </div>
             ))}
           </div>
         </div>
 
-        <div style={{ position: 'sticky', top: 0, height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', background: '#ebebeb' }}>
-          <Gallery images={images} imgIndex={imgIndex} setImgIndex={setImgIndex} imgCount={imgCount} project={project} />
-        </div>
-      </div>
+        {/* Mobile: single column */}
+        <div className="flex flex-col md:hidden" style={{ gap: 32 }}>
+          <div>
+            <p style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.35)', marginBottom: 12 }}>
+              {refNum}
+            </p>
+            <h1 style={{ fontSize: 24, fontWeight: 300, lineHeight: 1.2, marginBottom: 20 }}>
+              {project.label}
+            </h1>
+            {project.description && (
+              <p style={{ fontSize: 13, lineHeight: 1.85, color: 'rgba(0,0,0,0.6)' }}>
+                {project.description}
+              </p>
+            )}
+          </div>
 
-      {/* Mobile */}
-      <div className="flex flex-col md:hidden" style={{ paddingTop: '72px', paddingBottom: '72px' }}>
-        <div style={{ padding: '0 24px 24px' }}>
-          <p style={{ fontSize: '9px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.35)', marginBottom: 10 }}>
-            {refNum}
-          </p>
-          <h1 style={{ fontSize: '22px', fontWeight: 300, lineHeight: 1.2, color: '#111111' }}>
-            {project.label}
-          </h1>
-        </div>
-
-        <div style={{ margin: '0 24px' }}>
-          <div style={{ position: 'relative', width: '100%', aspectRatio: '4/3', background: '#ebebeb', borderRadius: 2, overflow: 'hidden' }}>
-            <Gallery images={images} imgIndex={imgIndex} setImgIndex={setImgIndex} imgCount={imgCount} project={project} />
+          <div style={{ borderTop: '0.5px solid rgba(0,0,0,0.12)', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {metaFields.map(({ label, value }) => (
+              <div key={label}>
+                <p style={{ fontSize: 11, fontWeight: 600, marginBottom: 3 }}>{label}</p>
+                <p style={{ fontSize: 13, color: 'rgba(0,0,0,0.55)' }}>{value}</p>
+              </div>
+            ))}
           </div>
         </div>
-
-        <div style={{ margin: '32px 24px 0', borderTop: border }}>
-          {metaRows.map(({ label, value }) => (
-            <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '14px 0', borderBottom: border }}>
-              <span style={{ fontSize: '9px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.35)' }}>{label}</span>
-              <span style={{ fontSize: '12px', color: 'rgba(0,0,0,0.65)' }}>{value}</span>
-            </div>
-          ))}
-        </div>
-
-        <p style={{ margin: '32px 24px 0', fontSize: '13px', lineHeight: 1.9, color: 'rgba(0,0,0,0.55)' }}>
-          {project.description}
-        </p>
       </div>
     </div>
-  )
-}
-
-function Gallery({ images, imgIndex, setImgIndex, imgCount, project }: {
-  images: string[]
-  imgIndex: number
-  setImgIndex: React.Dispatch<React.SetStateAction<number>>
-  imgCount: number
-  project: Project
-}) {
-  return (
-    <>
-      {images.length > 0 ? (
-        isVideo(images[imgIndex]) ? (
-          <video key={imgIndex} src={images[imgIndex]} controls className="max-w-full max-h-full" style={{ animation: 'fadeIn 0.35s ease' }} />
-        ) : (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img key={imgIndex} src={images[imgIndex]} alt="" className="max-w-full max-h-full object-contain" style={{ animation: 'fadeIn 0.35s ease' }} />
-        )
-      ) : (
-        <div className="w-full h-full" style={{ background: project.color ?? '#ddd', opacity: 0.3 }} />
-      )}
-      {imgCount > 1 && (
-        <>
-          <button onClick={() => setImgIndex(i => Math.max(0, i - 1))} disabled={imgIndex === 0} className="gallery-arrow absolute left-5 top-1/2 -translate-y-1/2 z-10">←</button>
-          <button onClick={() => setImgIndex(i => Math.min(imgCount - 1, i + 1))} disabled={imgIndex === imgCount - 1} className="gallery-arrow absolute right-5 top-1/2 -translate-y-1/2 z-10">→</button>
-        </>
-      )}
-      <span className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10" style={{ fontSize: '9px', letterSpacing: '0.2em', color: 'rgba(0,0,0,0.35)' }}>
-        {imgIndex + 1} / {imgCount}
-      </span>
-    </>
   )
 }
