@@ -52,10 +52,10 @@ export default function Home() {
         <Link href="/about" style={{ fontSize: 13, color: '#111', textDecoration: 'none' }}>
           about
         </Link>
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <button onClick={() => setView(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/apple-touch-icon.png" alt="Konnerad" style={{ width: 28, height: 28, display: 'block', borderRadius: 4 }} />
-        </Link>
+        </button>
         <div />
       </nav>
 
@@ -90,14 +90,14 @@ export default function Home() {
             transition: 'transform 0.45s cubic-bezier(0.34,1.56,0.64,1)',
             pointerEvents: 'none',
           }} />
-          <button onClick={() => setView(false)} title="disc"
+          <button onClick={() => setView(false)} title="disc view"
             style={{ width: 36, height: 36, borderRadius: '50%', border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 4 }}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <circle cx="8" cy="8" r="6.5" stroke={isGrid ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.75)'} strokeWidth="1.5" />
               <circle cx="8" cy="8" r="1.5" fill={isGrid ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.75)'} />
             </svg>
           </button>
-          <button onClick={() => setView(true)} title="list"
+          <button onClick={() => setView(true)} title="list view"
             style={{ width: 36, height: 36, borderRadius: '50%', border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               {[4, 8, 12].map(y => (

@@ -157,7 +157,7 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
         </div>
       </div>
 
-      {/* Fixed scroll toggle — bottom right */}
+      {/* Fixed scroll toggle — bottom right, same style as counter arrows */}
       <button
         onClick={atBottom ? scrollToTop : scrollToMeta}
         style={{
@@ -166,24 +166,21 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
           border: '1.5px solid rgba(0,0,0,0.3)',
           background: '#fff', cursor: 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          transition: 'border-color 0.15s',
+          fontSize: 20, color: 'rgba(0,0,0,0.5)', lineHeight: 1,
+          transition: 'border-color 0.15s, color 0.15s',
         }}
-        onMouseEnter={e => { e.currentTarget.style.borderColor = '#111' }}
-        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.3)' }}
+        onMouseEnter={e => { e.currentTarget.style.borderColor = '#111'; e.currentTarget.style.color = '#111' }}
+        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.3)'; e.currentTarget.style.color = 'rgba(0,0,0,0.5)' }}
       >
-        <svg width="11" height="17" viewBox="0 0 11 17" fill="none"
-          style={{ transform: atBottom ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
-          <line x1="5.5" y1="0" x2="5.5" y2="13" stroke="rgba(0,0,0,0.6)" strokeWidth="2.2" strokeLinecap="round"/>
-          <polyline points="1,9 5.5,14.5 10,9" stroke="rgba(0,0,0,0.6)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-        </svg>
+        {atBottom ? '↑' : '↓'}
       </button>
 
       {/* Metadata — revealed by scrolling */}
       <div ref={metaRef} style={{ padding: `48px ${SIDE} 100px` }}>
 
-        {/* Desktop: two fixed-width columns centered on page */}
-        <div className="hidden md:flex" style={{ gap: 80, justifyContent: 'center' }}>
-          <div style={{ width: 350, flexShrink: 0 }}>
+        {/* Desktop: two columns filling the same padded width as the gallery */}
+        <div className="hidden md:flex" style={{ gap: 40 }}>
+          <div style={{ flex: 1, minWidth: 0, paddingLeft: 5 }}>
             <h1 style={{ fontSize: 18, fontWeight: 700, lineHeight: 1.5, marginBottom: 4 }}>
               {project.label}
             </h1>
@@ -193,7 +190,7 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
               </p>
             )}
           </div>
-          <div style={{ width: 350, flexShrink: 0 }}>
+          <div style={{ flex: 1, minWidth: 0, paddingRight: 5 }}>
             {metaFields.map(({ label, value }) => (
               <div key={label} style={{ marginBottom: 28 }}>
                 <p style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>{label}</p>
