@@ -135,19 +135,19 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
       {/* Metadata — revealed by scrolling */}
       <div style={{ padding: `48px ${SIDE} 100px` }}>
 
-        {/* Desktop: two columns */}
+        {/* Desktop: two columns, same 150px side inset as gallery */}
         <div className="hidden md:grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '0 80px' }}>
           <div>
-            <h1 style={{ fontSize: 'clamp(28px,3vw,44px)', fontWeight: 400, lineHeight: 1.15, marginBottom: 28, letterSpacing: '-0.01em' }}>
+            <h1 style={{ fontSize: 16, fontWeight: 700, lineHeight: 1.5, marginBottom: 4 }}>
               {project.label}
             </h1>
             {project.description && (
-              <p style={{ fontSize: 16, lineHeight: 1.75, color: 'rgba(0,0,0,0.65)', maxWidth: '48ch' }}>
+              <p style={{ fontSize: 16, lineHeight: 1.75, color: 'rgba(0,0,0,0.65)' }}>
                 {project.description}
               </p>
             )}
           </div>
-          <div style={{ paddingTop: 6 }}>
+          <div>
             {metaFields.map(({ label, value }) => (
               <div key={label} style={{ marginBottom: 28 }}>
                 <p style={{ fontSize: 16, fontWeight: 700, marginBottom: 4 }}>{label}</p>
@@ -158,9 +158,9 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
         </div>
 
         {/* Mobile: single column */}
-        <div className="flex flex-col md:hidden" style={{ gap: 32 }}>
+        <div className="flex flex-col md:hidden" style={{ gap: 24 }}>
           <div>
-            <h1 style={{ fontSize: 26, fontWeight: 400, lineHeight: 1.2, marginBottom: 20 }}>
+            <h1 style={{ fontSize: 15, fontWeight: 700, lineHeight: 1.5, marginBottom: 4 }}>
               {project.label}
             </h1>
             {project.description && (
@@ -169,7 +169,7 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
               </p>
             )}
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             {metaFields.map(({ label, value }) => (
               <div key={label}>
                 <p style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{label}</p>
