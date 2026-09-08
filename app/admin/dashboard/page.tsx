@@ -6,6 +6,7 @@ import { Project } from '@/lib/supabase'
 
 type FormData = {
   label: string
+  disc_label: string
   year: string
   tag: string
   client: string
@@ -13,7 +14,7 @@ type FormData = {
 }
 
 const emptyForm = (): FormData => ({
-  label: '', year: new Date().getFullYear().toString(),
+  label: '', disc_label: '', year: new Date().getFullYear().toString(),
   tag: '', client: '', description: '',
 })
 
@@ -74,7 +75,7 @@ export default function Dashboard() {
 
   function startEdit(p: Project) {
     setEditing(p.id)
-    setForm({ label: p.label, year: p.year, tag: p.tag, client: p.client ?? '', description: p.description })
+    setForm({ label: p.label, disc_label: p.disc_label ?? '', year: p.year, tag: p.tag, client: p.client ?? '', description: p.description })
     setImages(p.images ?? [])
     setThumbnail(p.thumbnail ?? '')
     setPanel('edit')
@@ -235,6 +236,21 @@ export default function Dashboard() {
                 <div>
                   <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(0,0,0,0.35)' }}>Title</label>
                   <input className={inputClass} style={inputStyle} value={form.label} onChange={e => setForm(f => ({ ...f, label: e.target.value }))} placeholder="Project name" />
+                </div>
+                <div>
+                  <label className="block text-[9px] tracking-[0.2em] uppercase mb-1" style={{ color: 'rgba(0,0,0,0.35)' }}>
+                    Disc title <span style={{ color: 'rgba(0,0,0,0.2)', textTransform: 'none', letterSpacing: 0 }}>— max 35 chars, shown on the disc</span>
+                  </label>
+                  <input
+                    className={inputClass} style={inputStyle}
+                    value={form.disc_label}
+                    onChange={e => setForm(f => ({ ...f, disc_label: e.target.value.slice(0, 35) }))}
+                    placeholder={form.label.slice(0, 35) || 'Short disc title'}
+                    maxLength={35}
+                  />
+                  <p className="text-[9px] mt-1" style={{ color: 'rgba(0,0,0,0.2)' }}>
+                    {form.disc_label.length}/35 — falls back to Title if left empty
+                  </p>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>

@@ -3,6 +3,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js'
 export type Project = {
   id: string
   label: string
+  disc_label: string
   year: string
   tag: string
   description: string

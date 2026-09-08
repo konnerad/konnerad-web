@@ -93,8 +93,6 @@ export default function GridView({
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={img} alt={p.label} style={{
                     width: '100%', height: '100%', objectFit: 'contain', display: 'block',
-                    transform: isHov ? 'scale(1.06)' : 'scale(1)',
-                    transition: 'transform 0.4s ease',
                   }} />
                 ) : (
                   <div style={{ width: '100%', height: '100%', background: '#f0eeeb' }} />
