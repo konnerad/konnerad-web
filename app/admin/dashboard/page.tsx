@@ -4,22 +4,17 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Project } from '@/lib/supabase'
 
-const COLORS = ['#7F77DD', '#1D9E75', '#D85A30', '#D4537E', '#378ADD', '#EF9F27', '#9B7FDD', '#2DAE85', '#E06840', '#DD5488']
-const SHAPES = ['circle', 'square', 'diamond'] as const
-
 type FormData = {
   label: string
   year: string
   tag: string
   client: string
   description: string
-  color: string
-  shape: typeof SHAPES[number]
 }
 
 const emptyForm = (): FormData => ({
   label: '', year: new Date().getFullYear().toString(),
-  tag: '', client: '', description: '', color: COLORS[0], shape: 'circle',
+  tag: '', client: '', description: '',
 })
 
 export default function Dashboard() {
@@ -32,6 +27,7 @@ export default function Dashboard() {
   const [uploading, setUploading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [panel, setPanel] = useState<'list' | 'edit'>('list')
+  const [dragIdx, setDragIdx] = useState<number | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const thumbRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
@@ -54,7 +50,7 @@ export default function Dashboard() {
 
   function startEdit(p: Project) {
     setEditing(p.id)
-    setForm({ label: p.label, year: p.year, tag: p.tag, client: p.client ?? '', description: p.description, color: p.color, shape: p.shape })
+    setForm({ label: p.label, year: p.year, tag: p.tag, client: p.client ?? '', description: p.description })
     setImages(p.images ?? [])
     setThumbnail(p.thumbnail ?? '')
     setPanel('edit')
@@ -237,56 +233,18 @@ export default function Dashboard() {
                     placeholder="Short description of the project"
                   />
                 </div>
-                <div>
-                  <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(0,0,0,0.35)' }}>Colour</label>
-                  <div className="flex gap-2 flex-wrap">
-                    {COLORS.map(c => (
-                      <button
-                        key={c}
-                        onClick={() => setForm(f => ({ ...f, color: c }))}
-                        className="w-7 h-7 rounded-full transition-transform"
-                        style={{
-                          background: c,
-                          outline: form.color === c ? `2px solid ${c}` : 'none',
-                          outlineOffset: '2px',
-                          transform: form.color === c ? 'scale(1.2)' : 'scale(1)',
-                        }}
-                      />
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(0,0,0,0.35)' }}>Shape</label>
-                  <div className="flex gap-2">
-                    {SHAPES.map(s => (
-                      <button
-                        key={s}
-                        onClick={() => setForm(f => ({ ...f, shape: s }))}
-                        className="px-3 py-1.5 text-[10px] tracking-wider uppercase rounded-sm transition-colors"
-                        style={{
-                          background: form.shape === s ? 'rgba(0,0,0,0.15)' : 'rgba(232,228,220,0.05)',
-                          border: `0.5px solid ${form.shape === s ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.1)'}`,
-                          color: form.shape === s ? '#111111' : 'rgba(0,0,0,0.45)',
-                        }}
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                </div>
               </div>
 
               {/* Right: thumbnail + images & videos */}
               <div className="flex flex-col min-h-0 gap-6">
 
-                {/* Galaxy thumbnail */}
+                {/* Project thumbnail */}
                 <div>
-                  <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(0,0,0,0.35)' }}>Galaxy Thumbnail</label>
+                  <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(0,0,0,0.35)' }}>Project Thumbnail</label>
                   <div className="flex gap-3 items-start">
-                    {/* Preview */}
                     <div
-                      className="rounded-full overflow-hidden shrink-0"
-                      style={{ width: 72, height: 72, background: thumbnail ? 'transparent' : 'rgba(232,228,220,0.06)', border: '0.5px solid rgba(0,0,0,0.15)' }}
+                      className="rounded-sm overflow-hidden shrink-0"
+                      style={{ width: 72, height: 72, background: thumbnail ? 'transparent' : 'rgba(0,0,0,0.04)', border: '0.5px solid rgba(0,0,0,0.15)' }}
                     >
                       {thumbnail && (
                         // eslint-disable-next-line @next/next/no-img-element
@@ -310,7 +268,7 @@ export default function Dashboard() {
                         </button>
                       )}
                       <p className="text-[9px] leading-relaxed" style={{ color: 'rgba(0,0,0,0.2)' }}>
-                        Shown as the orbiting circle in the galaxy view. If left empty, the first gallery image is used.
+                        Shown on the disc and in the list view. If left empty, the first image is used.
                       </p>
                     </div>
                   </div>
@@ -342,7 +300,7 @@ export default function Dashboard() {
 
                 {images.length > 0 && (
                   <p className="text-[9px] tracking-wider mb-2 shrink-0" style={{ color: 'rgba(0,0,0,0.25)' }}>
-                    Click an image to set it as the galaxy cover
+                    Drag to reorder — first image is the cover
                   </p>
                 )}
 
@@ -352,19 +310,32 @@ export default function Dashboard() {
                     {images.map((url, i) => {
                       const video = /\.(mp4|mov|webm|m4v|avi)(\?|$)/i.test(url)
                       const isCover = i === 0
+                      const isDragging = dragIdx === i
                       return (
                         <div
                           key={url}
-                          className="relative group rounded-sm overflow-hidden aspect-square bg-black cursor-pointer"
-                          style={{ outline: isCover ? '2px solid rgba(0,0,0,0.5)' : 'none', outlineOffset: '2px' }}
-                          onClick={() => {
-                            if (i === 0) return
+                          draggable
+                          onDragStart={() => setDragIdx(i)}
+                          onDragEnd={() => setDragIdx(null)}
+                          onDragOver={e => e.preventDefault()}
+                          onDrop={e => {
+                            e.preventDefault()
+                            if (dragIdx === null || dragIdx === i) return
                             setImages(prev => {
                               const next = [...prev]
-                              // move clicked item to front
-                              next.unshift(next.splice(i, 1)[0])
+                              const [moved] = next.splice(dragIdx, 1)
+                              next.splice(i, 0, moved)
                               return next
                             })
+                            setDragIdx(null)
+                          }}
+                          className="relative group rounded-sm overflow-hidden aspect-square bg-black"
+                          style={{
+                            outline: isCover ? '2px solid rgba(0,0,0,0.5)' : 'none',
+                            outlineOffset: '2px',
+                            cursor: 'grab',
+                            opacity: isDragging ? 0.4 : 1,
+                            transition: 'opacity 0.15s',
                           }}
                         >
                           {video ? (
