@@ -125,10 +125,18 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
         </div>
 
         {/* Counter — always visible at bottom of viewport */}
-        <div style={{ height: COUNTER_H, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <div style={{ height: COUNTER_H, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexShrink: 0 }}>
+          <button onClick={prev} disabled={imgIndex === 0}
+            style={{ background: 'none', border: 'none', cursor: imgIndex === 0 ? 'default' : 'pointer', fontSize: 14, color: imgIndex === 0 ? 'rgba(0,0,0,0.18)' : 'rgba(0,0,0,0.5)', padding: 0, lineHeight: 1 }}>
+            ←
+          </button>
           <span style={{ fontSize: 12, color: 'rgba(0,0,0,0.35)', letterSpacing: '0.04em' }}>
             {imgIndex + 1}/{imgCount}
           </span>
+          <button onClick={next} disabled={imgIndex === imgCount - 1}
+            style={{ background: 'none', border: 'none', cursor: imgIndex === imgCount - 1 ? 'default' : 'pointer', fontSize: 14, color: imgIndex === imgCount - 1 ? 'rgba(0,0,0,0.18)' : 'rgba(0,0,0,0.5)', padding: 0, lineHeight: 1 }}>
+            →
+          </button>
         </div>
       </div>
 
