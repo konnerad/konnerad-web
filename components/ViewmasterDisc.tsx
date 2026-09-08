@@ -3,20 +3,20 @@
 import { useMemo, useState, useRef } from 'react'
 import { Project } from '@/lib/supabase'
 
-const N = 14
 const CX = 420
 const CY = 420
 const DISC_R = 412
 const FRAME_R = 290
-const NOTCH_R = 380
-const NUM_R = 205
-const FRAME_W = 84
-const FRAME_H = 105
-const STEP = 360 / N
+const NOTCH_R = 382
 const VIEWER_R = 118
 const F = "'Helvetica Neue', Helvetica, Arial, sans-serif"
-// White — background is now #fff so cutout triangles will show through
 const DISC_COLOR = '#f6f5f1'
+
+const MIN_N = 14
+const MAX_N = 20
+// Base frame dimensions at N=14
+const BASE_W = 62
+const BASE_H = 80
 
 function clockToXY(clockDeg: number, r: number) {
   const rad = (clockDeg * Math.PI) / 180
@@ -36,35 +36,37 @@ export default function ViewmasterDisc({
   const rotRef = useRef(0)
   const spinTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const { windows, notches, numbers } = useMemo(() => {
-    const windows: { idx: number; transform: string; clockDeg: number }[] = []
+  // N scales from 14 up to 20 as projects are added
+  const N = Math.min(MAX_N, Math.max(MIN_N, projects.length))
+  const STEP = 360 / N
+  const scale = MIN_N / N
+  const FRAME_W = BASE_W * scale
+  const FRAME_H = BASE_H * scale
+  const rx = 16 * scale
+
+  const { frames, notches } = useMemo(() => {
+    const frames: { idx: number; transform: string; clockDeg: number }[] = []
     const notches: { transform: string }[] = []
-    const numbers: { n: number; transform: string }[] = []
-    let numCounter = 0
 
     for (let idx = 0; idx < N; idx++) {
-      const clockDeg = idx * STEP - STEP / 2
-      const isPrimary = idx % 2 === 0
+      const clockDeg = idx * STEP
       const pos = clockToXY(clockDeg, FRAME_R)
-      windows.push({ idx, clockDeg, transform: `translate(${pos.x.toFixed(1)},${pos.y.toFixed(1)}) rotate(${clockDeg.toFixed(1)})` })
-
-      if (isPrimary) {
-        numCounter += 1
-        const gapDeg = clockDeg + STEP / 2
-        const npos = clockToXY(gapDeg, NOTCH_R)
-        notches.push({ transform: `translate(${npos.x.toFixed(1)},${npos.y.toFixed(1)}) rotate(${gapDeg.toFixed(1)})` })
-        const nupos = clockToXY(gapDeg, NUM_R)
-        numbers.push({ n: numCounter, transform: `translate(${nupos.x.toFixed(1)},${nupos.y.toFixed(1)}) rotate(${gapDeg.toFixed(1)})` })
-      }
+      frames.push({
+        idx,
+        clockDeg,
+        transform: `translate(${pos.x.toFixed(1)},${pos.y.toFixed(1)}) rotate(${clockDeg.toFixed(1)})`,
+      })
+      // Small notch between frames
+      const notchDeg = clockDeg + STEP / 2
+      const npos = clockToXY(notchDeg, NOTCH_R)
+      notches.push({ transform: `translate(${npos.x.toFixed(1)},${npos.y.toFixed(1)}) rotate(${notchDeg.toFixed(1)})` })
     }
-    return { windows, notches, numbers }
-  }, [])
+    return { frames, notches }
+  }, [N, STEP])
 
   function selectFrame(idx: number) {
-    if (idx % 2 !== 0) return
-    if (!projects[idx / 2]) return
-
-    const clockDeg = idx * STEP - STEP / 2
+    if (!projects[idx]) return
+    const clockDeg = idx * STEP
     const targetRot = -clockDeg
     const current = rotRef.current
     const delta = ((targetRot - current) % 360 + 540) % 360 - 180
@@ -72,13 +74,12 @@ export default function ViewmasterDisc({
     rotRef.current = next
     setDiscRotation(next)
     setSelected(idx)
-
     setShadowLifted(true)
     if (spinTimer.current) clearTimeout(spinTimer.current)
     spinTimer.current = setTimeout(() => setShadowLifted(false), 300)
   }
 
-  const viewerProject = projects[selected / 2] ?? null
+  const viewerProject = projects[selected] ?? null
   const viewerImg = viewerProject ? (viewerProject.thumbnail || viewerProject.images?.[0]) : null
 
   return (
@@ -88,151 +89,112 @@ export default function ViewmasterDisc({
         style={{ width: 'min(88vw, 580px)', height: 'auto', display: 'block', overflow: 'visible', touchAction: 'manipulation' }}
       >
         <defs>
-          {/*
-            Paper grain — uses soft-light blend so the noise darkens/lightens the base
-            colour naturally. feComposite clips back to the disc shape at the end.
-            Works on iOS Safari, Android Chrome, and all desktop browsers.
-          */}
           <filter id="vmGrain" x="-2%" y="-2%" width="104%" height="104%">
             <feTurbulence type="fractalNoise" baseFrequency="0.60 0.65" numOctaves="4" seed="5" result="noise" />
             <feColorMatrix in="noise" type="saturate" values="0" result="grayNoise" />
             <feBlend in="SourceGraphic" in2="grayNoise" mode="soft-light" result="blended" />
             <feComposite in="blended" in2="SourceGraphic" operator="in" />
           </filter>
-
-          {/* Blur for cast shadow */}
           <filter id="shadowBlur" x="-30%" y="-30%" width="160%" height="160%">
             <feGaussianBlur stdDeviation="20" />
           </filter>
-
-          {/* Disc mask: punches transparent triangle holes at the top */}
           <mask id="discMask">
             <circle cx={CX} cy={CY} r={DISC_R} fill="white" />
-            {/* Black = transparent hole — left V-cut */}
             <g transform="translate(363.2,16.0) rotate(-8)">
               <polygon points="0,18 34,-16 -34,-16" fill="black" />
             </g>
-            {/* Black = transparent hole — right V-cut */}
             <g transform="translate(476.8,16.0) rotate(8)">
               <polygon points="0,18 34,-16 -34,-16" fill="black" />
             </g>
           </mask>
-
           <clipPath id="viewerClip">
             <circle cx="0" cy="0" r={VIEWER_R} />
           </clipPath>
-          {windows.map(w => (
-            <clipPath key={`clip-${w.idx}`} id={`frameClip-${w.idx}`}>
-              <rect x={-FRAME_W / 2 + 3} y={-FRAME_H / 2 + 3} width={FRAME_W - 6} height={FRAME_H - 6} rx="18" />
+          {frames.map(f => (
+            <clipPath key={`clip-${f.idx}`} id={`frameClip-${f.idx}`}>
+              <rect x={-FRAME_W / 2 + 2} y={-FRAME_H / 2 + 2} width={FRAME_W - 4} height={FRAME_H - 4} rx={rx - 2} />
             </clipPath>
           ))}
         </defs>
 
-        {/*
-          Split shadow — simulates Viewmaster frame-advance:
-          at rest: one wide shadow centered below-right
-          spinning: splits to left and right wings, then merges back
-        */}
+        {/* Shadow */}
         <g style={{ transition: 'opacity 0.30s ease', opacity: shadowLifted ? 0 : 1 }}>
-          {/* Resting shadow — oval, not flat, so it reads as a real disc */}
           <ellipse cx={CX + 28} cy={CY + DISC_R - 55} rx={DISC_R * 0.58} ry={52}
             fill="black" filter="url(#shadowBlur)" opacity={0.18} />
         </g>
         <g style={{ transition: 'opacity 0.30s ease', opacity: shadowLifted ? 1 : 0 }}>
-          <ellipse
-            cx={CX} cy={CY + DISC_R - 55}
-            rx={DISC_R * 0.28} ry={36}
+          <ellipse cx={CX} cy={CY + DISC_R - 55} rx={DISC_R * 0.28} ry={36}
             fill="black" filter="url(#shadowBlur)" opacity={0.12}
-            style={{ transform: `translateX(${shadowLifted ? '-180px' : '0'})`, transition: 'transform 0.32s cubic-bezier(0.4,0,0.2,1)' }}
-          />
-          <ellipse
-            cx={CX} cy={CY + DISC_R - 55}
-            rx={DISC_R * 0.28} ry={36}
+            style={{ transform: `translateX(${shadowLifted ? '-180px' : '0'})`, transition: 'transform 0.32s cubic-bezier(0.4,0,0.2,1)' }} />
+          <ellipse cx={CX} cy={CY + DISC_R - 55} rx={DISC_R * 0.28} ry={36}
             fill="black" filter="url(#shadowBlur)" opacity={0.12}
-            style={{ transform: `translateX(${shadowLifted ? '180px' : '0'})`, transition: 'transform 0.32s cubic-bezier(0.4,0,0.2,1)' }}
-          />
+            style={{ transform: `translateX(${shadowLifted ? '180px' : '0'})`, transition: 'transform 0.32s cubic-bezier(0.4,0,0.2,1)' }} />
         </g>
 
-        {/* ── Rotating disc ── */}
-        <g
-          style={{
-            transform: `rotate(${discRotation}deg)`,
-            transformOrigin: `${CX}px ${CY}px`,
-            transition: 'transform 0.65s cubic-bezier(0.4,0,0.2,1)',
-          }}
-        >
-          {/* Disc surface — base colour + grain filter applied together, no external image */}
+        {/* Rotating disc */}
+        <g style={{
+          transform: `rotate(${discRotation}deg)`,
+          transformOrigin: `${CX}px ${CY}px`,
+          transition: 'transform 0.65s cubic-bezier(0.4,0,0.2,1)',
+        }}>
           <circle cx={CX} cy={CY} r={DISC_R} fill={DISC_COLOR} filter="url(#vmGrain)" mask="url(#discMask)" />
 
           {/* Frames */}
-          {windows.map((w) => {
-            const isPrimary = w.idx % 2 === 0
-            const project = isPrimary ? projects[w.idx / 2] : null
+          {frames.map((f) => {
+            const project = projects[f.idx] ?? null
             const imgUrl = project ? (project.thumbnail || project.images?.[0]) : null
-            const isSelected = w.idx === selected
+            const isSelected = f.idx === selected
 
             return (
               <g
-                key={w.idx}
-                style={{ cursor: isPrimary && project ? 'pointer' : 'default' }}
-                transform={w.transform}
-                onClick={() => selectFrame(w.idx)}
-                onTouchEnd={(e) => { e.preventDefault(); selectFrame(w.idx) }}
+                key={f.idx}
+                style={{ cursor: project ? 'pointer' : 'default' }}
+                transform={f.transform}
+                onClick={() => selectFrame(f.idx)}
+                onTouchEnd={(e) => { e.preventDefault(); selectFrame(f.idx) }}
               >
-                <rect x={-FRAME_W / 2} y={-FRAME_H / 2} width={FRAME_W} height={FRAME_H} rx="20"
+                {/* Drop shadow */}
+                <rect x={-FRAME_W / 2} y={-FRAME_H / 2} width={FRAME_W} height={FRAME_H} rx={rx}
                   transform="translate(1.5,2.5)" fill="rgba(0,0,0,0.14)" />
-                <rect x={-FRAME_W / 2} y={-FRAME_H / 2} width={FRAME_W} height={FRAME_H} rx="20"
+                {/* Frame body */}
+                <rect x={-FRAME_W / 2} y={-FRAME_H / 2} width={FRAME_W} height={FRAME_H} rx={rx}
                   fill={imgUrl ? '#111' : '#d8d5ce'} stroke="#c8c4bc" strokeWidth="0.8" />
                 {imgUrl && (
                   <>
                     {project?.disc_contain && (
-                      <rect x={-FRAME_W / 2 + 3} y={-FRAME_H / 2 + 3} width={FRAME_W - 6} height={FRAME_H - 6}
-                        fill="#ffffff" clipPath={`url(#frameClip-${w.idx})`} />
+                      <rect x={-FRAME_W / 2 + 2} y={-FRAME_H / 2 + 2} width={FRAME_W - 4} height={FRAME_H - 4}
+                        fill="#ffffff" clipPath={`url(#frameClip-${f.idx})`} />
                     )}
                     <image
                       href={imgUrl}
-                      x={-FRAME_W / 2 + 3} y={-FRAME_H / 2 + 3}
-                      width={FRAME_W - 6} height={FRAME_H - 6}
+                      x={-FRAME_W / 2 + 2} y={-FRAME_H / 2 + 2}
+                      width={FRAME_W - 4} height={FRAME_H - 4}
                       preserveAspectRatio={project?.disc_contain ? 'xMidYMid meet' : 'xMidYMid slice'}
-                      clipPath={`url(#frameClip-${w.idx})`}
+                      clipPath={`url(#frameClip-${f.idx})`}
                     />
                   </>
                 )}
                 {isSelected && (
-                  <rect x={-FRAME_W / 2 - 6} y={-FRAME_H / 2 - 6}
-                    width={FRAME_W + 12} height={FRAME_H + 12} rx="24"
-                    fill="none" stroke="#ffd23f" strokeWidth="3.5" />
+                  <rect x={-FRAME_W / 2 - 5} y={-FRAME_H / 2 - 5}
+                    width={FRAME_W + 10} height={FRAME_H + 10} rx={rx + 4}
+                    fill="none" stroke="#ffd23f" strokeWidth="3" />
                 )}
               </g>
             )
           })}
 
-          {/* Notches — cut out (white = page background shows through) */}
+          {/* Notches between frames */}
           {notches.map((n, i) => (
             <g key={i} transform={n.transform}>
-              {/* Depth shadow around the hole */}
-              <rect x="-13" y="-28" width="26" height="56" rx="7"
-                fill="rgba(0,0,0,0.18)" />
-              {/* The hole itself — white matches page background */}
-              <rect x="-12" y="-27" width="24" height="54" rx="6"
-                fill="#ffffff" />
-            </g>
-          ))}
-
-          {/* Numbers */}
-          {numbers.map((nu, i) => (
-            <g key={i} transform={nu.transform}>
-              <text x="0" y="7" textAnchor="middle"
-                fontFamily={F} fontWeight="600" fontSize="18" fill="#9a9690">
-                {nu.n}
-              </text>
+              <rect x="-9" y="-20" width="18" height="40" rx="5" fill="rgba(0,0,0,0.18)" />
+              <rect x="-8" y="-19" width="16" height="38" rx="4" fill="#ffffff" />
             </g>
           ))}
 
           {/* Centre hole */}
           <circle cx={CX} cy={CY} r="9" fill="#d4d0c8" stroke="#bbb8b0" strokeWidth="1" />
 
-          {/* "UP FOR VIEWER" */}
+          {/* Label */}
           <g transform={`translate(${CX},${CY - 178})`}>
             <text x="0" y="0" textAnchor="middle"
               fontFamily={F} fontWeight="500" fontSize="10" letterSpacing="1.5" fill="#9a9690">
@@ -241,7 +203,7 @@ export default function ViewmasterDisc({
           </g>
         </g>
 
-        {/* ── Fixed center viewer ── */}
+        {/* Fixed center viewer */}
         <g
           transform={`translate(${CX},${CY})`}
           style={{ cursor: viewerProject ? 'pointer' : 'default' }}
