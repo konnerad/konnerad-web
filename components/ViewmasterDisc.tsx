@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState, useRef } from 'react'
+import { useMemo, useState, useRef, useEffect } from 'react'
 import { Project } from '@/lib/supabase'
 
 const CX = 420
@@ -33,8 +33,16 @@ export default function ViewmasterDisc({
   const [selected, setSelected] = useState(0)
   const [discRotation, setDiscRotation] = useState(0)
   const [shadowLifted, setShadowLifted] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const rotRef = useRef(0)
   const spinTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768 || 'ontouchstart' in window)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   // N scales from 14 up to 20 as projects are added
   const N = Math.min(MAX_N, Math.max(MIN_N, projects.length))
@@ -133,11 +141,12 @@ export default function ViewmasterDisc({
 
         {/* Rotating disc */}
         <g style={{
-          transform: `rotate(${discRotation}deg)`,
+          transform: `rotate(${discRotation}deg) translateZ(0)`,
           transformOrigin: `${CX}px ${CY}px`,
           transition: 'transform 0.65s cubic-bezier(0.4,0,0.2,1)',
+          willChange: 'transform',
         }}>
-          <circle cx={CX} cy={CY} r={DISC_R} fill={DISC_COLOR} filter="url(#vmGrain)" mask="url(#discMask)" />
+          <circle cx={CX} cy={CY} r={DISC_R} fill={DISC_COLOR} filter={isMobile ? undefined : 'url(#vmGrain)'} mask="url(#discMask)" />
 
           {/* Frames */}
           {frames.map((f) => {

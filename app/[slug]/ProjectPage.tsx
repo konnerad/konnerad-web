@@ -109,7 +109,7 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
 
       {/* Gallery — fills exactly the remaining viewport height */}
       <div style={{
-        height: `calc(100vh - ${NAV_H}px)`,
+        height: `calc(100dvh - ${NAV_H}px)`,
         display: 'flex', flexDirection: 'column',
         padding: `0 ${SIDE}`,
       }}>
