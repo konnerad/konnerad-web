@@ -56,6 +56,8 @@ export default function Dashboard() {
   const [panel, setPanel] = useState<'list' | 'edit'>('list')
   const [dragIdx, setDragIdx] = useState<number | null>(null)
   const [projDragIdx, setProjDragIdx] = useState<number | null>(null)
+  const [thumbOver, setThumbOver] = useState(false)
+  const [filesOver, setFilesOver] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const thumbRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
@@ -328,60 +330,64 @@ export default function Dashboard() {
                 {/* Project thumbnail */}
                 <div>
                   <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(0,0,0,0.35)' }}>Project Thumbnail</label>
-                  <div className="flex gap-3 items-start">
-                    <div
-                      className="rounded-sm overflow-hidden shrink-0"
-                      style={{ width: 72, height: 72, background: thumbnail ? 'transparent' : 'rgba(0,0,0,0.04)', border: '0.5px solid rgba(0,0,0,0.15)' }}
-                    >
-                      {thumbnail && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={thumbnail} alt="" className="w-full h-full object-cover" />
-                      )}
-                    </div>
-                    <div className="flex flex-col gap-2 flex-1">
-                      <input ref={thumbRef} type="file" accept="image/*" className="hidden"
-                        onChange={e => { const f = e.target.files?.[0]; if (f) uploadThumbnail(f); e.target.value = '' }}
-                      />
-                      <button
-                        onClick={() => thumbRef.current?.click()}
-                        className="px-3 py-2 text-[10px] tracking-wider uppercase rounded-sm text-left"
-                        style={{ background: '#ffffff', border: '0.5px solid rgba(0,0,0,0.12)', color: uploadingThumb ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.6)' }}
-                      >
-                        {uploadingThumb ? 'Uploading…' : thumbnail ? 'Replace thumbnail' : 'Upload thumbnail'}
-                      </button>
-                      {thumbnail && (
-                        <button onClick={() => setThumbnail('')} className="text-[9px] tracking-wider uppercase text-left" style={{ color: '#D85A30' }}>
-                          Remove
-                        </button>
-                      )}
-                      <p className="text-[9px] leading-relaxed" style={{ color: 'rgba(0,0,0,0.2)' }}>
-                        Shown on the disc and in the list view. If left empty, the first image is used.
+                  <input ref={thumbRef} type="file" accept="image/*" className="hidden"
+                    onChange={e => { const f = e.target.files?.[0]; if (f) uploadThumbnail(f); e.target.value = '' }}
+                  />
+                  <div
+                    onClick={() => thumbRef.current?.click()}
+                    onDragOver={e => { e.preventDefault(); setThumbOver(true) }}
+                    onDragLeave={() => setThumbOver(false)}
+                    onDrop={e => {
+                      e.preventDefault(); setThumbOver(false)
+                      const f = e.dataTransfer.files[0]
+                      if (f?.type.startsWith('image/')) uploadThumbnail(f)
+                    }}
+                    className="rounded-sm overflow-hidden cursor-pointer transition-colors"
+                    style={{
+                      height: 90, border: `1px dashed ${thumbOver ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.15)'}`,
+                      background: thumbOver ? 'rgba(0,0,0,0.04)' : thumbnail ? 'transparent' : 'rgba(0,0,0,0.02)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative',
+                    }}
+                  >
+                    {thumbnail ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={thumbnail} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    ) : (
+                      <p className="text-[11px]" style={{ color: 'rgba(0,0,0,0.25)' }}>
+                        {uploadingThumb ? 'Uploading…' : 'Drop or click to upload'}
                       </p>
-                    </div>
+                    )}
                   </div>
+                  {thumbnail && (
+                    <button onClick={() => setThumbnail('')} className="text-[9px] tracking-wider uppercase mt-1" style={{ color: '#D85A30' }}>
+                      Remove
+                    </button>
+                  )}
+                  <p className="text-[9px] mt-1 leading-relaxed" style={{ color: 'rgba(0,0,0,0.2)' }}>
+                    Shown on the disc and in the list view. If left empty, the first image is used.
+                  </p>
                 </div>
 
                 {/* Gallery images & videos */}
                 <div className="flex flex-col min-h-0">
                 <label className="block text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(0,0,0,0.35)' }}>Images &amp; Videos</label>
+                <input
+                  ref={fileRef} type="file" accept="image/*,video/*" multiple className="hidden"
+                  onChange={e => { Array.from(e.target.files ?? []).forEach(f => uploadImage(f)); e.target.value = '' }}
+                />
                 <div
                   className="p-4 rounded-sm mb-3 text-center cursor-pointer transition-colors shrink-0"
-                  style={{ border: '1px dashed rgba(0,0,0,0.15)', background: 'rgba(0,0,0,0.02)' }}
+                  style={{ border: `1px dashed ${filesOver ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.15)'}`, background: filesOver ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.02)' }}
                   onClick={() => fileRef.current?.click()}
+                  onDragOver={e => { e.preventDefault(); setFilesOver(true) }}
+                  onDragLeave={() => setFilesOver(false)}
+                  onDrop={e => {
+                    e.preventDefault(); setFilesOver(false)
+                    Array.from(e.dataTransfer.files).forEach(f => uploadImage(f))
+                  }}
                 >
-                  <input
-                    ref={fileRef}
-                    type="file"
-                    accept="image/*,video/*"
-                    multiple
-                    className="hidden"
-                    onChange={e => {
-                      Array.from(e.target.files ?? []).forEach(f => uploadImage(f))
-                      e.target.value = ''
-                    }}
-                  />
                   <p className="text-[11px]" style={{ color: uploading ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.25)' }}>
-                    {uploading ? 'Uploading…' : '+ Click to upload images or videos'}
+                    {uploading ? 'Uploading…' : '+ Drop files or click to upload'}
                   </p>
                 </div>
 
