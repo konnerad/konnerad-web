@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { Project } from '@/lib/supabase'
 import { slugify } from '@/lib/slugify'
@@ -59,6 +59,9 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
   }, [prev, next])
+
+  const metaRef = useRef<HTMLDivElement>(null)
+  const scrollToMeta = () => metaRef.current?.scrollIntoView({ behavior: 'smooth' })
 
   const metaFields = [
     { label: 'Year',   value: project.year         },
@@ -124,8 +127,8 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
           )}
         </div>
 
-        {/* Counter — always visible at bottom of viewport */}
-        <div style={{ height: COUNTER_H, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexShrink: 0 }}>
+        {/* Counter row — counter centered, scroll-down button at right */}
+        <div style={{ height: COUNTER_H, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexShrink: 0, position: 'relative' }}>
           <button onClick={prev} disabled={imgIndex === 0}
             style={{ background: 'none', border: 'none', cursor: imgIndex === 0 ? 'default' : 'pointer', fontSize: 14, color: imgIndex === 0 ? 'rgba(0,0,0,0.18)' : 'rgba(0,0,0,0.5)', padding: 0, lineHeight: 1 }}>
             ←
@@ -137,11 +140,30 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
             style={{ background: 'none', border: 'none', cursor: imgIndex === imgCount - 1 ? 'default' : 'pointer', fontSize: 14, color: imgIndex === imgCount - 1 ? 'rgba(0,0,0,0.18)' : 'rgba(0,0,0,0.5)', padding: 0, lineHeight: 1 }}>
             →
           </button>
+
+          {/* Scroll-down button */}
+          <button
+            onClick={scrollToMeta}
+            title="See details"
+            style={{
+              position: 'absolute', right: 0,
+              width: 30, height: 30, borderRadius: '50%',
+              border: '1px solid rgba(0,0,0,0.25)',
+              background: 'none', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'rgba(0,0,0,0.45)', fontSize: 13, lineHeight: 1,
+              transition: 'border-color 0.15s, color 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.7)'; e.currentTarget.style.color = '#111' }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.25)'; e.currentTarget.style.color = 'rgba(0,0,0,0.45)' }}
+          >
+            ↓
+          </button>
         </div>
       </div>
 
       {/* Metadata — revealed by scrolling */}
-      <div style={{ padding: `48px ${SIDE} 100px` }}>
+      <div ref={metaRef} style={{ padding: `48px ${SIDE} 100px` }}>
 
         {/* Desktop: two equal columns filling the padded container */}
         <div className="hidden md:flex" style={{ gap: 80 }}>
