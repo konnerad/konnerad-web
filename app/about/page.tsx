@@ -9,7 +9,7 @@ export const metadata = {
 
 export default function AboutPage() {
   return (
-    <div style={{ minHeight: '100vh', background: '#fff', fontFamily: F, color: '#111' }}>
+    <div style={{ minHeight: '100dvh', background: '#fff', fontFamily: F, color: '#111' }}>
 
       {/* Nav */}
       <nav style={{

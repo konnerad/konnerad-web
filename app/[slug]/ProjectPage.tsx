@@ -31,14 +31,14 @@ export default function ProjectPage({ slug }: { slug: string }) {
 
   if (notFound) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: F, gap: 16 }}>
+      <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: F, gap: 16 }}>
         <span style={{ fontSize: 13, color: 'rgba(0,0,0,0.4)' }}>Project not found</span>
         <Link href="/" style={{ fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.4)', textDecoration: 'none' }}>← Back</Link>
       </div>
     )
   }
 
-  if (!project) return <div style={{ minHeight: '100vh', background: '#fff' }} />
+  if (!project) return <div style={{ minHeight: '100dvh', background: '#fff' }} />
 
   return <ProjectDetail project={project} refNum={refNum} />
 }
@@ -89,7 +89,7 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
   const COUNTER_H = 36
 
   return (
-    <div style={{ minHeight: '100vh', background: '#fff', fontFamily: F, color: '#111' }}>
+    <div style={{ minHeight: '100dvh', background: '#fff', fontFamily: F, color: '#111' }}>
 
       {/* Nav — About left, favicon center */}
       <nav style={{

@@ -41,7 +41,7 @@ export default function Home() {
   }
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: '#ffffff', overflow: 'hidden' }}>
+    <div style={{ height: '100dvh', display: 'flex', flexDirection: 'column', background: '#ffffff', overflow: 'hidden' }}>
 
       {/* Nav */}
       <nav style={{
