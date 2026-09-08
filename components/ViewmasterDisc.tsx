@@ -15,8 +15,8 @@ const DISC_COLOR = '#f6f5f1'
 const MIN_N = 14
 const MAX_N = 20
 // Base frame dimensions at N=14
-const BASE_W = 62
-const BASE_H = 80
+const BASE_W = 84
+const BASE_H = 105
 
 function clockToXY(clockDeg: number, r: number) {
   const rad = (clockDeg * Math.PI) / 180
