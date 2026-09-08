@@ -6,6 +6,7 @@ import { Project } from '@/lib/supabase'
 import { slugify } from '@/lib/slugify'
 
 const F = "'Helvetica Neue', Helvetica, Arial, sans-serif"
+const NAV_H = 56 // px — must match the nav element height
 
 function isVideo(url: string) {
   return /\.(mp4|mov|webm|m4v|avi)(\?|$)/i.test(url)
@@ -65,22 +66,35 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
     { label: 'Type',   value: project.tag    || '—' },
   ].filter(f => f.value && f.value !== '—')
 
+  const SIDE = 'clamp(40px, 10vw, 150px)'
+  const COUNTER_H = 36
+
   return (
     <div style={{ minHeight: '100vh', background: '#fff', fontFamily: F, color: '#111' }}>
 
       {/* Nav */}
-      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 32px', borderBottom: '0.5px solid rgba(0,0,0,0.1)' }}>
-        <Link href="/" style={{ fontFamily: F, fontSize: 13, color: '#111', textDecoration: 'none', letterSpacing: '-0.01em' }}>
+      <nav style={{
+        height: NAV_H,
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        padding: `0 32px`,
+        borderBottom: '0.5px solid rgba(0,0,0,0.1)',
+      }}>
+        <Link href="/" style={{ fontSize: 13, color: '#111', textDecoration: 'none', letterSpacing: '-0.01em' }}>
           Konnerad
         </Link>
-        <Link href="/" style={{ fontFamily: F, fontSize: 13, color: '#111', textDecoration: 'none' }}>
+        <Link href="/" style={{ fontSize: 13, color: '#111', textDecoration: 'none' }}>
           ← Projects
         </Link>
       </nav>
 
-      {/* Gallery */}
-      <div style={{ position: 'relative', width: '100%', background: '#f0efed' }}>
-        <div style={{ position: 'relative', width: '100%', paddingTop: '62%', overflow: 'hidden' }}>
+      {/* Gallery — fills exactly the remaining viewport height */}
+      <div style={{
+        height: `calc(100vh - ${NAV_H}px)`,
+        display: 'flex', flexDirection: 'column',
+        padding: `0 ${SIDE}`,
+      }}>
+        {/* Image area — takes all space above the counter */}
+        <div style={{ flex: 1, position: 'relative', overflow: 'hidden', minHeight: 0 }}>
           {images.length > 0 ? (
             isVideo(images[imgIndex]) ? (
               <video
@@ -95,42 +109,37 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
                 key={imgIndex}
                 src={images[imgIndex]}
                 alt=""
-                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', animation: 'fadeIn 0.25s ease' }}
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', animation: 'fadeIn 0.2s ease' }}
               />
             )
           ) : (
-            <div style={{ position: 'absolute', inset: 0, background: project.color ?? '#ddd', opacity: 0.3 }} />
+            <div style={{ position: 'absolute', inset: 0, background: project.color ?? '#eee', opacity: 0.25 }} />
           )}
 
-          {/* Arrow buttons */}
+          {/* Click zones for prev/next */}
           {imgCount > 1 && (
             <>
-              <button
-                onClick={prev} disabled={imgIndex === 0}
-                style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '50%', background: 'none', border: 'none', cursor: imgIndex === 0 ? 'default' : 'w-resize', zIndex: 2 }}
-              />
-              <button
-                onClick={next} disabled={imgIndex === imgCount - 1}
-                style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '50%', background: 'none', border: 'none', cursor: imgIndex === imgCount - 1 ? 'default' : 'e-resize', zIndex: 2 }}
-              />
+              <button onClick={prev} disabled={imgIndex === 0}
+                style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '50%', background: 'none', border: 'none', cursor: imgIndex === 0 ? 'default' : 'w-resize', zIndex: 2 }} />
+              <button onClick={next} disabled={imgIndex === imgCount - 1}
+                style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '50%', background: 'none', border: 'none', cursor: imgIndex === imgCount - 1 ? 'default' : 'e-resize', zIndex: 2 }} />
             </>
           )}
         </div>
 
-        {/* Counter */}
-        <div style={{ padding: '10px 32px', display: 'flex', justifyContent: 'flex-end' }}>
-          <span style={{ fontSize: 11, color: 'rgba(0,0,0,0.35)', fontFamily: F, letterSpacing: '0.04em' }}>
+        {/* Counter — always visible at bottom of viewport */}
+        <div style={{ height: COUNTER_H, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <span style={{ fontSize: 12, color: 'rgba(0,0,0,0.35)', letterSpacing: '0.04em' }}>
             {imgIndex + 1}/{imgCount}
           </span>
         </div>
       </div>
 
-      {/* Metadata — two columns desktop, one column mobile */}
-      <div style={{ borderTop: '0.5px solid rgba(0,0,0,0.12)', padding: '40px 32px 80px' }}>
+      {/* Metadata — revealed by scrolling */}
+      <div style={{ borderTop: '0.5px solid rgba(0,0,0,0.12)', padding: `40px ${SIDE} 80px` }}>
 
         {/* Desktop: two columns */}
         <div className="hidden md:grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '0 80px' }}>
-          {/* Left — title + description */}
           <div>
             <p style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.35)', marginBottom: 16 }}>
               {refNum}
@@ -144,12 +153,10 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
               </p>
             )}
           </div>
-
-          {/* Right — structured fields */}
           <div style={{ paddingTop: 4 }}>
             {metaFields.map(({ label, value }) => (
               <div key={label} style={{ marginBottom: 24 }}>
-                <p style={{ fontSize: 12, fontWeight: 600, marginBottom: 4, letterSpacing: '0.01em' }}>{label}</p>
+                <p style={{ fontSize: 12, fontWeight: 600, marginBottom: 4 }}>{label}</p>
                 <p style={{ fontSize: 13, color: 'rgba(0,0,0,0.55)', lineHeight: 1.6 }}>{value}</p>
               </div>
             ))}
@@ -157,7 +164,7 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
         </div>
 
         {/* Mobile: single column */}
-        <div className="flex flex-col md:hidden" style={{ gap: 32 }}>
+        <div className="flex flex-col md:hidden" style={{ gap: 28 }}>
           <div>
             <p style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.35)', marginBottom: 12 }}>
               {refNum}
@@ -171,8 +178,7 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
               </p>
             )}
           </div>
-
-          <div style={{ borderTop: '0.5px solid rgba(0,0,0,0.12)', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <div style={{ borderTop: '0.5px solid rgba(0,0,0,0.1)', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
             {metaFields.map(({ label, value }) => (
               <div key={label}>
                 <p style={{ fontSize: 11, fontWeight: 600, marginBottom: 3 }}>{label}</p>
