@@ -165,16 +165,18 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
           width: 36, height: 36, borderRadius: '50%',
           border: '1px solid rgba(0,0,0,0.3)',
           background: '#fff', cursor: 'pointer',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
           padding: 0, transition: 'background 0.15s, border-color 0.15s',
+          overflow: 'hidden',
         }}
         onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.75)'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.75)'; e.currentTarget.querySelector('svg')!.style.stroke = '#fff' }}
         onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.3)'; e.currentTarget.querySelector('svg')!.style.stroke = 'rgba(0,0,0,0.5)' }}
       >
-        <svg width="10" height="14" viewBox="0 0 10 14" fill="none"
-          style={{ stroke: 'rgba(0,0,0,0.5)', transition: 'stroke 0.15s', transform: atBottom ? 'rotate(180deg)' : 'none' }}>
-          <line x1="5" y1="0" x2="5" y2="10" strokeWidth="1.5" strokeLinecap="round"/>
-          <polyline points="1,7 5,12 9,7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+        {/* SVG fills the button exactly — arrow drawn centered at (18,18) */}
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none"
+          style={{ stroke: 'rgba(0,0,0,0.5)', transition: 'stroke 0.15s', display: 'block',
+            transform: atBottom ? 'rotate(180deg)' : 'none', transformOrigin: '18px 18px' }}>
+          <line x1="18" y1="9" x2="18" y2="24" strokeWidth="1.5" strokeLinecap="round"/>
+          <polyline points="12,21 18,27 24,21" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       </button>
 
