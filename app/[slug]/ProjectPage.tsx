@@ -135,9 +135,9 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
       {/* Metadata — revealed by scrolling */}
       <div style={{ padding: `48px ${SIDE} 100px` }}>
 
-        {/* Desktop: two columns, same 150px side inset as gallery */}
-        <div className="hidden md:grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '0 80px' }}>
-          <div>
+        {/* Desktop: two columns centered around the page midpoint */}
+        <div className="hidden md:flex" style={{ justifyContent: 'center', gap: '0 80px' }}>
+          <div style={{ width: 'calc(50vw - 120px)', maxWidth: 480, minWidth: 200 }}>
             <h1 style={{ fontSize: 16, fontWeight: 700, lineHeight: 1.5, marginBottom: 4 }}>
               {project.label}
             </h1>
@@ -147,7 +147,7 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
               </p>
             )}
           </div>
-          <div>
+          <div style={{ width: 'calc(50vw - 120px)', maxWidth: 480, minWidth: 200 }}>
             {metaFields.map(({ label, value }) => (
               <div key={label} style={{ marginBottom: 28 }}>
                 <p style={{ fontSize: 16, fontWeight: 700, marginBottom: 4 }}>{label}</p>
