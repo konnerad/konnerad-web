@@ -166,15 +166,16 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
           border: '1px solid rgba(0,0,0,0.3)',
           background: '#fff', cursor: 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          padding: 0,
-          transition: 'border-color 0.15s, color 0.15s',
+          padding: 0, transition: 'background 0.15s, border-color 0.15s',
         }}
-        onMouseEnter={e => { e.currentTarget.style.borderColor = '#111' }}
-        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.3)' }}
+        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.75)'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.75)'; e.currentTarget.querySelector('svg')!.style.stroke = '#fff' }}
+        onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.3)'; e.currentTarget.querySelector('svg')!.style.stroke = 'rgba(0,0,0,0.5)' }}
       >
-        <span style={{ fontSize: 16, color: 'rgba(0,0,0,0.5)', lineHeight: 1, display: 'block', marginTop: atBottom ? '-1px' : '1px' }}>
-          {atBottom ? '↑' : '↓'}
-        </span>
+        <svg width="10" height="14" viewBox="0 0 10 14" fill="none"
+          style={{ stroke: 'rgba(0,0,0,0.5)', transition: 'stroke 0.15s', transform: atBottom ? 'rotate(180deg)' : 'none' }}>
+          <line x1="5" y1="0" x2="5" y2="10" strokeWidth="1.5" strokeLinecap="round"/>
+          <polyline points="1,7 5,12 9,7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+        </svg>
       </button>
 
       {/* Metadata — revealed by scrolling */}
