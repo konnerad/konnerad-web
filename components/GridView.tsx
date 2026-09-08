@@ -88,7 +88,7 @@ export default function GridView({
               }}
             >
               {/* Thumbnail */}
-              <div style={{ width: THUMB, height: THUMB, flexShrink: 0, overflow: 'hidden', background: '#fff', border: '0.5px solid rgba(0,0,0,0.06)' }}>
+              <div style={{ width: THUMB, height: THUMB, flexShrink: 0, overflow: 'hidden', background: '#fff' }}>
                 {img ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={img} alt={p.label} style={{
