@@ -55,6 +55,7 @@ export default function Dashboard() {
   const [saving, setSaving] = useState(false)
   const [panel, setPanel] = useState<'list' | 'edit'>('list')
   const [dragIdx, setDragIdx] = useState<number | null>(null)
+  const [ytInput, setYtInput] = useState('')
   const [projDragIdx, setProjDragIdx] = useState<number | null>(null)
   const [thumbOver, setThumbOver] = useState(false)
   const [filesOver, setFilesOver] = useState(false)
@@ -408,6 +409,26 @@ export default function Dashboard() {
                   </p>
                 </div>
 
+                {/* YouTube URL */}
+                <div className="flex gap-2 mb-3 shrink-0">
+                  <input
+                    className={inputClass} style={{ ...inputStyle, flex: 1 }}
+                    value={ytInput}
+                    onChange={e => setYtInput(e.target.value)}
+                    placeholder="Paste YouTube URL…"
+                  />
+                  <button
+                    onClick={() => {
+                      const url = ytInput.trim()
+                      if (url) { setImages(prev => [...prev, url]); setYtInput('') }
+                    }}
+                    className="px-3 py-2 text-[10px] tracking-wider uppercase rounded-sm shrink-0"
+                    style={{ background: '#ffffff', border: '0.5px solid rgba(0,0,0,0.12)', color: 'rgba(0,0,0,0.6)' }}
+                  >
+                    Add
+                  </button>
+                </div>
+
                 {images.length > 0 && (
                   <p className="text-[9px] tracking-wider mb-2 shrink-0" style={{ color: 'rgba(0,0,0,0.25)' }}>
                     Drag to reorder — first image is the cover
@@ -419,6 +440,7 @@ export default function Dashboard() {
                   <div className="grid grid-cols-2 gap-2">
                     {images.map((url, i) => {
                       const video = /\.(mp4|mov|webm|m4v|avi)(\?|$)/i.test(url)
+                      const ytId = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/)?.[1]
                       const isCover = i === 0
                       const isDragging = dragIdx === i
                       return (
@@ -448,7 +470,10 @@ export default function Dashboard() {
                             transition: 'opacity 0.15s',
                           }}
                         >
-                          {video ? (
+                          {ytId ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={`https://img.youtube.com/vi/${ytId}/mqdefault.jpg`} alt="" className="w-full h-full object-cover" />
+                          ) : video ? (
                             <video src={url} className="w-full h-full object-contain" muted />
                           ) : (
                             // eslint-disable-next-line @next/next/no-img-element
@@ -475,7 +500,7 @@ export default function Dashboard() {
                               color: isCover ? '#111111' : 'rgba(0,0,0,0.5)',
                             }}
                           >
-                            {isCover ? '★ Cover' : video ? 'Video' : `${i + 1}`}
+                            {isCover ? '★ Cover' : ytId ? 'YouTube' : video ? 'Video' : `${i + 1}`}
                           </span>
                         </div>
                       )

@@ -12,6 +12,11 @@ function isVideo(url: string) {
   return /\.(mp4|mov|webm|m4v|avi)(\?|$)/i.test(url)
 }
 
+function youtubeId(url: string): string | null {
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/)
+  return m ? m[1] : null
+}
+
 export default function ProjectPage({ slug }: { slug: string }) {
   const [project, setProject] = useState<Project | null>(null)
   const [refNum, setRefNum] = useState('')
@@ -63,7 +68,7 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
   // Preload all images so flipping through them is instant
   useEffect(() => {
     images.forEach(url => {
-      if (!isVideo(url)) { const img = new Image(); img.src = url }
+      if (!isVideo(url) && !youtubeId(url)) { const img = new Image(); img.src = url }
     })
   }, [images])
 
@@ -115,24 +120,36 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
       }}>
         {/* Image area — takes all space above the counter */}
         <div style={{ flex: 1, position: 'relative', overflow: 'hidden', minHeight: 0 }}>
-          {images.length > 0 ? (
-            isVideo(images[imgIndex]) ? (
+          {images.length > 0 ? (() => {
+            const url = images[imgIndex]
+            const ytId = youtubeId(url)
+            if (ytId) return (
+              <iframe
+                key={imgIndex}
+                src={`https://www.youtube.com/embed/${ytId}?rel=0&modestbranding=1`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
+              />
+            )
+            if (isVideo(url)) return (
               <video
                 key={imgIndex}
-                src={images[imgIndex]}
+                src={url}
                 controls
                 style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }}
               />
-            ) : (
+            )
+            return (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 key={imgIndex}
-                src={images[imgIndex]}
+                src={url}
                 alt=""
                 style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', animation: 'fadeIn 0.2s ease' }}
               />
             )
-          ) : (
+          })() : (
             <div style={{ position: 'absolute', inset: 0, background: project.color ?? '#eee', opacity: 0.25 }} />
           )}
 
