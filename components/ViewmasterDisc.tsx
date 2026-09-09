@@ -56,7 +56,7 @@ export default function ViewmasterDisc({
       }
       if (!n) { console.log('[disc] no opaque pixels'); return }
       const base = { r: 246, g: 245, b: 241 }
-      const w = 0.28
+      const w = 0.9
       const mix = (c: number, bv: number) => Math.round((c / n) * w + bv * (1 - w))
       const color = `rgb(${mix(r, base.r)},${mix(g, base.g)},${mix(b, base.b)})`
       console.log('[disc] setting discColor to', color)
