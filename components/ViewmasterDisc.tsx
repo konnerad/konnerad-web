@@ -34,8 +34,38 @@ export default function ViewmasterDisc({
   const [discRotation, setDiscRotation] = useState(0)
   const [shadowLifted, setShadowLifted] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [discColor, setDiscColor] = useState(DISC_COLOR)
   const rotRef = useRef(0)
   const spinTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  function extractDominantColor(imgUrl: string) {
+    console.log('[disc] extractDominantColor called with', imgUrl)
+    if (!imgUrl || imgUrl.includes('youtube')) return
+    const img = new Image()
+    img.onload = () => {
+      console.log('[disc] image loaded, sampling canvas')
+      const canvas = document.createElement('canvas')
+      canvas.width = canvas.height = 16
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return
+      ctx.drawImage(img, 0, 0, 16, 16)
+      const { data } = ctx.getImageData(0, 0, 16, 16)
+      let r = 0, g = 0, b = 0, n = 0
+      for (let i = 0; i < data.length; i += 4) {
+        if (data[i + 3] > 128) { r += data[i]; g += data[i + 1]; b += data[i + 2]; n++ }
+      }
+      if (!n) { console.log('[disc] no opaque pixels'); return }
+      const base = { r: 246, g: 245, b: 241 }
+      const w = 0.28
+      const mix = (c: number, bv: number) => Math.round((c / n) * w + bv * (1 - w))
+      const color = `rgb(${mix(r, base.r)},${mix(g, base.g)},${mix(b, base.b)})`
+      console.log('[disc] setting discColor to', color)
+      setDiscColor(color)
+    }
+    img.onerror = (e) => console.error('[disc] image load error', e)
+    img.src = `/api/dominant-color?url=${encodeURIComponent(imgUrl)}`
+    console.log('[disc] loading via proxy:', img.src)
+  }
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768 || 'ontouchstart' in window)
@@ -43,6 +73,12 @@ export default function ViewmasterDisc({
     window.addEventListener('resize', check)
     return () => window.removeEventListener('resize', check)
   }, [])
+
+  useEffect(() => {
+    const p = projects[selected]
+    if (p) extractDominantColor(p.thumbnail || p.images?.[0] || '')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected, projects])
 
   // N scales from 14 up to 20 as projects are added
   const N = Math.min(MAX_N, Math.max(MIN_N, projects.length))
@@ -146,7 +182,8 @@ export default function ViewmasterDisc({
           transition: 'transform 0.65s cubic-bezier(0.4,0,0.2,1)',
           willChange: 'transform',
         }}>
-          <circle cx={CX} cy={CY} r={DISC_R} fill={DISC_COLOR} filter={isMobile ? undefined : 'url(#vmGrain)'} mask="url(#discMask)" />
+          <circle cx={CX} cy={CY} r={DISC_R} fill={discColor} filter={isMobile ? undefined : 'url(#vmGrain)'} mask="url(#discMask)"
+            style={{ transition: 'fill 0.65s ease' }} />
 
           {/* Frames */}
           {frames.map((f) => {
