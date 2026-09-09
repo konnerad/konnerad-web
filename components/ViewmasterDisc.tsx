@@ -48,24 +48,29 @@ export default function ViewmasterDisc({
       if (!ctx) return
       ctx.drawImage(img, 0, 0, 64, 64)
       const { data } = ctx.getImageData(0, 0, 64, 64)
-      // Group pixels into coarse buckets to find the dominant colour cluster,
-      // then average the actual pixel values in that cluster for an exact shade.
-      const buckets: Record<string, { count: number; r: number; g: number; b: number }> = {}
+      const buckets: Record<string, { count: number; r: number; g: number; b: number; vibrant: boolean }> = {}
+      let total = 0
       for (let i = 0; i < data.length; i += 4) {
         if (data[i + 3] < 128) continue
-        const key = `${Math.floor(data[i] / 32)},${Math.floor(data[i + 1] / 32)},${Math.floor(data[i + 2] / 32)}`
-        if (!buckets[key]) buckets[key] = { count: 0, r: 0, g: 0, b: 0 }
+        total++
+        const pr = data[i], pg = data[i + 1], pb = data[i + 2]
+        const vibrant = Math.max(pr, pg, pb) - Math.min(pr, pg, pb) > 60
+        const key = `${Math.floor(pr / 32)},${Math.floor(pg / 32)},${Math.floor(pb / 32)}`
+        if (!buckets[key]) buckets[key] = { count: 0, r: 0, g: 0, b: 0, vibrant }
         buckets[key].count++
-        buckets[key].r += data[i]
-        buckets[key].g += data[i + 1]
-        buckets[key].b += data[i + 2]
+        buckets[key].r += pr
+        buckets[key].g += pg
+        buckets[key].b += pb
       }
-      const dominant = Object.values(buckets).sort((a, b) => b.count - a.count)[0]
-      if (!dominant) return
-      const r = Math.round(dominant.r / dominant.count)
-      const g = Math.round(dominant.g / dominant.count)
-      const b = Math.round(dominant.b / dominant.count)
-      setDiscColor(`rgb(${r},${g},${b})`)
+      if (!total) return
+      const all = Object.values(buckets)
+      // Prefer the most frequent vibrant bucket if it covers ≥30% of pixels
+      const vibrantBuckets = all.filter(b => b.vibrant).sort((a, b) => b.count - a.count)
+      const pick = (vibrantBuckets[0]?.count / total >= 0.30)
+        ? vibrantBuckets[0]
+        : all.sort((a, b) => b.count - a.count)[0]
+      if (!pick) return
+      setDiscColor(`rgb(${Math.round(pick.r / pick.count)},${Math.round(pick.g / pick.count)},${Math.round(pick.b / pick.count)})`)
     }
     img.onerror = () => {}
     img.src = `/api/dominant-color?url=${encodeURIComponent(imgUrl)}`
