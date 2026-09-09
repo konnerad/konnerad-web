@@ -48,20 +48,24 @@ export default function ViewmasterDisc({
       if (!ctx) return
       ctx.drawImage(img, 0, 0, 64, 64)
       const { data } = ctx.getImageData(0, 0, 64, 64)
-      // Quantize into coarse buckets (32 steps per channel) and find most frequent
+      // Group pixels into coarse buckets to find the dominant colour cluster,
+      // then average the actual pixel values in that cluster for an exact shade.
       const buckets: Record<string, { count: number; r: number; g: number; b: number }> = {}
       for (let i = 0; i < data.length; i += 4) {
         if (data[i + 3] < 128) continue
-        const r = Math.round(data[i] / 32) * 32
-        const g = Math.round(data[i + 1] / 32) * 32
-        const b = Math.round(data[i + 2] / 32) * 32
-        const key = `${r},${g},${b}`
-        if (!buckets[key]) buckets[key] = { count: 0, r, g, b }
+        const key = `${Math.floor(data[i] / 32)},${Math.floor(data[i + 1] / 32)},${Math.floor(data[i + 2] / 32)}`
+        if (!buckets[key]) buckets[key] = { count: 0, r: 0, g: 0, b: 0 }
         buckets[key].count++
+        buckets[key].r += data[i]
+        buckets[key].g += data[i + 1]
+        buckets[key].b += data[i + 2]
       }
       const dominant = Object.values(buckets).sort((a, b) => b.count - a.count)[0]
       if (!dominant) return
-      setDiscColor(`rgb(${dominant.r},${dominant.g},${dominant.b})`)
+      const r = Math.round(dominant.r / dominant.count)
+      const g = Math.round(dominant.g / dominant.count)
+      const b = Math.round(dominant.b / dominant.count)
+      setDiscColor(`rgb(${r},${g},${b})`)
     }
     img.onerror = () => {}
     img.src = `/api/dominant-color?url=${encodeURIComponent(imgUrl)}`
