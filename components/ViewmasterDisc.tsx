@@ -39,32 +39,32 @@ export default function ViewmasterDisc({
   const spinTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   function extractDominantColor(imgUrl: string) {
-    console.log('[disc] extractDominantColor called with', imgUrl)
     if (!imgUrl || imgUrl.includes('youtube')) return
     const img = new Image()
     img.onload = () => {
-      console.log('[disc] image loaded, sampling canvas')
       const canvas = document.createElement('canvas')
-      canvas.width = canvas.height = 16
+      canvas.width = canvas.height = 64
       const ctx = canvas.getContext('2d')
       if (!ctx) return
-      ctx.drawImage(img, 0, 0, 16, 16)
-      const { data } = ctx.getImageData(0, 0, 16, 16)
-      let r = 0, g = 0, b = 0, n = 0
+      ctx.drawImage(img, 0, 0, 64, 64)
+      const { data } = ctx.getImageData(0, 0, 64, 64)
+      // Quantize into coarse buckets (32 steps per channel) and find most frequent
+      const buckets: Record<string, { count: number; r: number; g: number; b: number }> = {}
       for (let i = 0; i < data.length; i += 4) {
-        if (data[i + 3] > 128) { r += data[i]; g += data[i + 1]; b += data[i + 2]; n++ }
+        if (data[i + 3] < 128) continue
+        const r = Math.round(data[i] / 32) * 32
+        const g = Math.round(data[i + 1] / 32) * 32
+        const b = Math.round(data[i + 2] / 32) * 32
+        const key = `${r},${g},${b}`
+        if (!buckets[key]) buckets[key] = { count: 0, r, g, b }
+        buckets[key].count++
       }
-      if (!n) { console.log('[disc] no opaque pixels'); return }
-      const base = { r: 246, g: 245, b: 241 }
-      const w = 0.9
-      const mix = (c: number, bv: number) => Math.round((c / n) * w + bv * (1 - w))
-      const color = `rgb(${mix(r, base.r)},${mix(g, base.g)},${mix(b, base.b)})`
-      console.log('[disc] setting discColor to', color)
-      setDiscColor(color)
+      const dominant = Object.values(buckets).sort((a, b) => b.count - a.count)[0]
+      if (!dominant) return
+      setDiscColor(`rgb(${dominant.r},${dominant.g},${dominant.b})`)
     }
-    img.onerror = (e) => console.error('[disc] image load error', e)
+    img.onerror = () => {}
     img.src = `/api/dominant-color?url=${encodeURIComponent(imgUrl)}`
-    console.log('[disc] loading via proxy:', img.src)
   }
 
   useEffect(() => {
