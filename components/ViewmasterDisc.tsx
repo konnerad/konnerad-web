@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Project } from '@/lib/supabase'
 
 const CX = 420
@@ -102,25 +102,16 @@ export default function ViewmasterDisc({
   const FRAME_H = BASE_H * scale
   const rx = 16 * scale
 
-  const { frames, notches } = useMemo(() => {
-    const frames: { idx: number; transform: string; clockDeg: number }[] = []
-    const notches: { transform: string }[] = []
-
-    for (let idx = 0; idx < N; idx++) {
-      const clockDeg = idx * STEP
-      const pos = clockToXY(clockDeg, FRAME_R)
-      frames.push({
-        idx,
-        clockDeg,
-        transform: `translate(${pos.x.toFixed(1)},${pos.y.toFixed(1)}) rotate(${clockDeg.toFixed(1)})`,
-      })
-      // Small notch between frames
-      const notchDeg = clockDeg + STEP / 2
-      const npos = clockToXY(notchDeg, NOTCH_R)
-      notches.push({ transform: `translate(${npos.x.toFixed(1)},${npos.y.toFixed(1)}) rotate(${notchDeg.toFixed(1)})` })
-    }
-    return { frames, notches }
-  }, [N, STEP])
+  const frames: { idx: number; transform: string; clockDeg: number }[] = []
+  const notches: { transform: string }[] = []
+  for (let idx = 0; idx < N; idx++) {
+    const clockDeg = idx * STEP
+    const pos = clockToXY(clockDeg, FRAME_R)
+    frames.push({ idx, clockDeg, transform: `translate(${pos.x.toFixed(1)},${pos.y.toFixed(1)}) rotate(${clockDeg.toFixed(1)})` })
+    const notchDeg = clockDeg + STEP / 2
+    const npos = clockToXY(notchDeg, NOTCH_R)
+    notches.push({ transform: `translate(${npos.x.toFixed(1)},${npos.y.toFixed(1)}) rotate(${notchDeg.toFixed(1)})` })
+  }
 
   function selectFrame(idx: number) {
     if (!projects[idx]) return
