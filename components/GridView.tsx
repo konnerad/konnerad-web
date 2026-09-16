@@ -136,8 +136,9 @@ export default function GridView({
                 display: 'grid',
                 gridTemplateColumns: gridCols,
                 gap: `0 ${isMobile ? 12 : 24}px`,
-                width: '100%',
-                padding: `${isMobile ? 12 : 16}px 0`,
+                width: 'calc(100% + 16px)',
+                margin: '0 -8px',
+                padding: `${isMobile ? 12 : 16}px 8px`,
                 borderBottom: BORDER,
                 background: isHov
                   ? (!colors[p.id] || isNearWhite(colors[p.id]) ? 'rgba(0,0,0,0.05)' : colors[p.id])
