@@ -6,6 +6,42 @@ import { Project } from '@/lib/supabase'
 const F = "'Helvetica Neue', Helvetica, Arial, sans-serif"
 const BORDER = '0.5px solid rgba(0,0,0,0.12)'
 
+function extractColor(imgUrl: string, cb: (color: string) => void) {
+  if (!imgUrl || imgUrl.includes('youtube')) return
+  const img = new Image()
+  img.onload = () => {
+    const canvas = document.createElement('canvas')
+    canvas.width = canvas.height = 64
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    ctx.drawImage(img, 0, 0, 64, 64)
+    const { data } = ctx.getImageData(0, 0, 64, 64)
+    const buckets: Record<string, { count: number; r: number; g: number; b: number; vibrant: boolean }> = {}
+    let total = 0
+    for (let i = 0; i < data.length; i += 4) {
+      if (data[i + 3] < 128) continue
+      total++
+      const pr = data[i], pg = data[i + 1], pb = data[i + 2]
+      const vibrant = Math.max(pr, pg, pb) - Math.min(pr, pg, pb) > 60
+      const key = `${Math.floor(pr / 32)},${Math.floor(pg / 32)},${Math.floor(pb / 32)}`
+      if (!buckets[key]) buckets[key] = { count: 0, r: 0, g: 0, b: 0, vibrant }
+      buckets[key].count++; buckets[key].r += pr; buckets[key].g += pg; buckets[key].b += pb
+    }
+    if (!total) return
+    const all = Object.values(buckets)
+    const vib = all.filter(b => b.vibrant).sort((a, b) => b.count - a.count)
+    const pick = (vib[0]?.count / total >= 0.30) ? vib[0] : all.sort((a, b) => b.count - a.count)[0]
+    if (!pick) return
+    const r = Math.round(pick.r / pick.count)
+    const g = Math.round(pick.g / pick.count)
+    const b = Math.round(pick.b / pick.count)
+    const mix = (c: number) => Math.round(c * 0.14 + 255 * 0.86)
+    cb(`rgb(${mix(r)},${mix(g)},${mix(b)})`)
+  }
+  img.onerror = () => {}
+  img.src = `/api/dominant-color?url=${encodeURIComponent(imgUrl)}`
+}
+
 export default function GridView({
   projects,
   onSelect,
@@ -15,6 +51,7 @@ export default function GridView({
 }) {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
   const [isMobile, setIsMobile] = useState(false)
+  const [colors, setColors] = useState<Record<string, string>>({})
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 640)
@@ -22,6 +59,18 @@ export default function GridView({
     window.addEventListener('resize', check)
     return () => window.removeEventListener('resize', check)
   }, [])
+
+  useEffect(() => {
+    projects.forEach(p => {
+      const img = p.thumbnail || p.images?.[0]
+      if (img && !colors[p.id]) {
+        extractColor(img, color => setColors(prev => ({ ...prev, [p.id]: color })))
+      }
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projects])
+
+  const hoveredColor = hoveredIdx != null ? (colors[projects[hoveredIdx]?.id] ?? null) : null
 
   const THUMB = isMobile ? 48 : 64
   const TITLE_SIZE = isMobile ? '13px' : '14px'
@@ -40,7 +89,7 @@ export default function GridView({
     : ['Image', 'Title', 'Kind', 'Client', 'Year']
 
   return (
-    <div className="absolute inset-0 overflow-y-auto" style={{ background: '#ffffff', fontFamily: F }}>
+    <div className="absolute inset-0 overflow-y-auto" style={{ background: hoveredColor ?? '#ffffff', fontFamily: F, transition: 'background 0.35s ease' }}>
       <div style={{ padding: PAD }}>
 
         {/* Header */}
@@ -79,7 +128,7 @@ export default function GridView({
                 width: '100%',
                 padding: `${isMobile ? 12 : 16}px 0`,
                 borderBottom: BORDER,
-                background: isHov ? 'rgba(0,0,0,0.025)' : 'transparent',
+                background: isHov ? 'rgba(0,0,0,0.06)' : 'transparent',
                 cursor: 'pointer',
                 textAlign: 'left',
                 alignItems: 'center',
