@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { createServiceClient } from '@/lib/supabase'
 
 const F = "'Helvetica Neue', Helvetica, Arial, sans-serif"
 const NAV_H = 56
@@ -7,7 +8,21 @@ export const metadata = {
   title: 'About — Konnerad',
 }
 
-export default function AboutPage() {
+export const revalidate = 60
+
+async function getAbout(): Promise<string> {
+  try {
+    const supabase = createServiceClient()
+    const { data } = await supabase.from('settings').select('value').eq('key', 'about').single()
+    return data?.value ?? ''
+  } catch {
+    return ''
+  }
+}
+
+export default async function AboutPage() {
+  const about = await getAbout()
+
   return (
     <div style={{ minHeight: '100dvh', background: '#fff', fontFamily: F, color: '#111' }}>
 
@@ -29,10 +44,11 @@ export default function AboutPage() {
 
       {/* Content */}
       <div style={{ padding: '60px 32px 100px', maxWidth: 560, margin: '0 auto' }}>
-        <h1 style={{ fontSize: 16, fontWeight: 700, marginBottom: 24 }}>About</h1>
-        <p style={{ fontSize: 16, lineHeight: 1.75, color: 'rgba(0,0,0,0.65)' }}>
-          Konnerad is the portfolio of selected works by Konrad.
-        </p>
+        {about && (
+          <p style={{ fontSize: 14, lineHeight: 1.75, color: 'rgba(0,0,0,0.65)', whiteSpace: 'pre-wrap' }}>
+            {about}
+          </p>
+        )}
       </div>
 
     </div>

@@ -59,6 +59,8 @@ export default function Dashboard() {
   const [projDragIdx, setProjDragIdx] = useState<number | null>(null)
   const [thumbOver, setThumbOver] = useState(false)
   const [filesOver, setFilesOver] = useState(false)
+  const [aboutText, setAboutText] = useState('')
+  const [aboutSaving, setAboutSaving] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const thumbRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
@@ -69,7 +71,22 @@ export default function Dashboard() {
     setProjects(await res.json())
   }
 
-  useEffect(() => { load() }, []) // eslint-disable-line
+  async function loadAbout() {
+    const res = await fetch('/api/admin/settings')
+    if (res.ok) { const d = await res.json(); setAboutText(d.about ?? '') }
+  }
+
+  async function saveAbout() {
+    setAboutSaving(true)
+    await fetch('/api/admin/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ about: aboutText }),
+    })
+    setAboutSaving(false)
+  }
+
+  useEffect(() => { load(); loadAbout() }, []) // eslint-disable-line
 
   function startNew() {
     setEditing(null)
@@ -202,6 +219,29 @@ export default function Dashboard() {
       <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '40px 40px 80px' }}>
         {panel === 'list' ? (
           <>
+            {/* About section */}
+            <div className="mb-10 p-6 rounded-sm" style={{ background: '#ffffff', border: '0.5px solid rgba(0,0,0,0.10)' }}>
+              <h2 className="text-[11px] tracking-[0.18em] uppercase mb-4" style={{ color: 'rgba(0,0,0,0.45)' }}>About page</h2>
+              <textarea
+                value={aboutText}
+                onChange={e => setAboutText(e.target.value)}
+                rows={5}
+                placeholder="Write your about text here…"
+                className="w-full px-3 py-2.5 text-[12px] outline-none rounded-sm resize-y"
+                style={{ background: '#F4F4F4', border: '0.5px solid rgba(0,0,0,0.12)', color: '#111', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", lineHeight: 1.7 }}
+              />
+              <div className="flex justify-end mt-3">
+                <button
+                  onClick={saveAbout}
+                  disabled={aboutSaving}
+                  className="px-4 py-2 text-[10px] tracking-[0.12em] uppercase rounded-sm"
+                  style={{ background: 'rgba(0,0,0,0.08)', border: '0.5px solid rgba(0,0,0,0.2)', color: 'rgba(0,0,0,0.7)', opacity: aboutSaving ? 0.5 : 1 }}
+                >
+                  {aboutSaving ? 'Saving…' : 'Save'}
+                </button>
+              </div>
+            </div>
+
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-[13px] tracking-[0.15em] uppercase" style={{ color: 'rgba(0,0,0,0.5)' }}>
                 Projects ({projects.length})
