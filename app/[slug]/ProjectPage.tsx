@@ -48,10 +48,53 @@ export default function ProjectPage({ slug }: { slug: string }) {
   return <ProjectDetail project={project} refNum={refNum} />
 }
 
+function extractDominantColor(imgUrl: string, cb: (color: string) => void) {
+  if (!imgUrl || imgUrl.includes('youtube')) return
+  const img = new Image()
+  img.onload = () => {
+    const canvas = document.createElement('canvas')
+    canvas.width = canvas.height = 64
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    ctx.drawImage(img, 0, 0, 64, 64)
+    const { data } = ctx.getImageData(0, 0, 64, 64)
+    const buckets: Record<string, { count: number; r: number; g: number; b: number; vibrant: boolean }> = {}
+    let total = 0
+    for (let i = 0; i < data.length; i += 4) {
+      if (data[i + 3] < 128) continue
+      total++
+      const pr = data[i], pg = data[i + 1], pb = data[i + 2]
+      const vibrant = Math.max(pr, pg, pb) - Math.min(pr, pg, pb) > 60
+      const key = `${Math.floor(pr / 32)},${Math.floor(pg / 32)},${Math.floor(pb / 32)}`
+      if (!buckets[key]) buckets[key] = { count: 0, r: 0, g: 0, b: 0, vibrant }
+      buckets[key].count++; buckets[key].r += pr; buckets[key].g += pg; buckets[key].b += pb
+    }
+    if (!total) return
+    const all = Object.values(buckets)
+    const vibrant = all.filter(b => b.vibrant).sort((a, b) => b.count - a.count)
+    const pick = (vibrant[0]?.count / total >= 0.30) ? vibrant[0] : all.sort((a, b) => b.count - a.count)[0]
+    if (!pick) return
+    const r = Math.round(pick.r / pick.count)
+    const g = Math.round(pick.g / pick.count)
+    const b = Math.round(pick.b / pick.count)
+    // Blend 14% into white so the page stays light and readable
+    const mix = (c: number) => Math.round(c * 0.14 + 255 * 0.86)
+    cb(`rgb(${mix(r)},${mix(g)},${mix(b)})`)
+  }
+  img.onerror = () => {}
+  img.src = `/api/dominant-color?url=${encodeURIComponent(imgUrl)}`
+}
+
 function ProjectDetail({ project, refNum }: { project: Project; refNum: string }) {
   const [imgIndex, setImgIndex] = useState(0)
+  const [bgColor, setBgColor] = useState('#ffffff')
   const images = project.images ?? []
   const imgCount = Math.max(images.length, 1)
+
+  useEffect(() => {
+    const thumb = project.thumbnail || images[0]
+    if (thumb) extractDominantColor(thumb, setBgColor)
+  }, [project.thumbnail, images])
 
   const prev = useCallback(() => setImgIndex(i => Math.max(0, i - 1)), [])
   const next = useCallback(() => setImgIndex(i => Math.min(imgCount - 1, i + 1)), [imgCount])
@@ -94,7 +137,7 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
   const COUNTER_H = 36
 
   return (
-    <div style={{ minHeight: '100dvh', background: '#fff', fontFamily: F, color: '#111' }}>
+    <div style={{ minHeight: '100dvh', background: bgColor, fontFamily: F, color: '#111', transition: 'background 0.65s ease' }}>
 
       {/* Nav — About left, favicon center */}
       <nav style={{
