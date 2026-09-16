@@ -87,7 +87,7 @@ export default function GridView({
   const TITLE_SIZE = isMobile ? '13px' : '14px'
   const META_SIZE = isMobile ? '13px' : '14px'
   const HEAD_SIZE = isMobile ? '10px' : '11px'
-  const PAD = isMobile ? '0 12px 80px' : '0 20px 80px'
+  const PAD = isMobile ? '0 20px 80px' : '0 32px 80px'
 
   // Mobile: thumbnail + title + year only
   // Desktop: thumbnail + title + kind + client + year
@@ -136,10 +136,10 @@ export default function GridView({
                 display: 'grid',
                 gridTemplateColumns: gridCols,
                 gap: `0 ${isMobile ? 12 : 24}px`,
-                width: 'calc(100% + 16px)',
-                margin: '0 -8px',
-                padding: `${isMobile ? 12 : 16}px 8px`,
+                width: '100%',
+                padding: `${isMobile ? 12 : 16}px 0`,
                 borderBottom: BORDER,
+                borderRadius: isHov ? 4 : 0,
                 background: isHov
                   ? (!colors[p.id] || isNearWhite(colors[p.id]) ? 'rgba(0,0,0,0.05)' : colors[p.id])
                   : 'transparent',
