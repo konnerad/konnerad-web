@@ -17,7 +17,7 @@ export default function AboutPage() {
   }, [])
 
   return (
-    <div style={{ height: '100dvh', background: '#fff', fontFamily: F, color: '#111', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100dvh', background: '#fff', fontFamily: F, color: '#111' }}>
 
       {/* Nav */}
       <nav style={{
@@ -36,7 +36,7 @@ export default function AboutPage() {
       </nav>
 
       {/* Content */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', padding: '60px 32px', maxWidth: 720, width: '100%', margin: '0 auto' }}>
+      <div style={{ padding: '60px 32px 100px', maxWidth: 720, margin: '0 auto' }}>
         {about && (
           <p style={{ fontSize: 14, lineHeight: 1.75, color: 'rgba(0,0,0,0.65)', whiteSpace: 'pre-wrap' }}>
             {about}
