@@ -94,10 +94,10 @@ export default function ViewmasterDisc({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected, projects])
 
-  // N scales from 14 up to 20 as projects are added
-  const N = Math.min(MAX_N, Math.max(MIN_N, projects.length))
+  // Frames equal the number of projects; scale down once past 14
+  const N = Math.max(1, projects.length)
   const STEP = 360 / N
-  const scale = MIN_N / N
+  const scale = N <= MIN_N ? 1 : MIN_N / N
   const FRAME_W = BASE_W * scale
   const FRAME_H = BASE_H * scale
   const rx = 16 * scale
@@ -199,16 +199,17 @@ export default function ViewmasterDisc({
           <circle cx={CX} cy={CY} r={DISC_R} fill={discColor} filter={isMobile ? undefined : 'url(#vmGrain)'} mask="url(#discMask)"
             style={{ transition: 'fill 0.65s ease' }} />
 
-          {/* Frames */}
+          {/* Frames — only rendered for actual projects */}
           {frames.map((f) => {
-            const project = projects[f.idx] ?? null
-            const imgUrl = project ? (project.thumbnail || project.images?.[0] || null) : null
+            const project = projects[f.idx]
+            if (!project) return null
+            const imgUrl = project.thumbnail || project.images?.[0] || null
             const isSelected = f.idx === selected
 
             return (
               <g
                 key={f.idx}
-                style={{ cursor: project ? 'pointer' : 'default' }}
+                style={{ cursor: 'pointer' }}
                 transform={f.transform}
                 onClick={() => selectFrame(f.idx)}
                 onTouchEnd={(e) => { e.preventDefault(); selectFrame(f.idx) }}
@@ -218,7 +219,7 @@ export default function ViewmasterDisc({
                   transform="translate(1.5,2.5)" fill="rgba(0,0,0,0.14)" />
                 {/* Frame body */}
                 <rect x={-FRAME_W / 2} y={-FRAME_H / 2} width={FRAME_W} height={FRAME_H} rx={rx}
-                  fill={imgUrl ? '#111' : '#d8d5ce'} stroke="#c8c4bc" strokeWidth="0.8" />
+                  fill="#111" stroke="#c8c4bc" strokeWidth="0.8" />
                 {imgUrl && (
                   <>
                     {project?.disc_contain && (
