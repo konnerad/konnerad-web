@@ -100,8 +100,8 @@ export default function GridView({
     : ['Image', 'Title', 'Kind', 'Client', 'Year']
 
   return (
-    <div className="absolute inset-0 overflow-y-auto" style={{ background: '#ffffff', fontFamily: F }}>
-      <div style={{ padding: PAD }}>
+    <div className="absolute inset-0 overflow-y-auto" style={{ background: '#ffffff', fontFamily: F, overflowX: 'hidden' }}>
+      <div style={{ padding: PAD, overflow: 'visible' }}>
 
         {/* Header */}
         <div style={{
@@ -136,10 +136,11 @@ export default function GridView({
                 display: 'grid',
                 gridTemplateColumns: gridCols,
                 gap: `0 ${isMobile ? 12 : 24}px`,
-                width: '100%',
-                padding: `${isMobile ? 12 : 16}px 0`,
+                width: 'calc(100% + 16px)',
+                marginLeft: -8,
+                padding: `${isMobile ? 12 : 16}px 8px`,
                 borderBottom: BORDER,
-                borderRadius: isHov ? 4 : 0,
+                borderRadius: 4,
                 background: isHov
                   ? (!colors[p.id] || isNearWhite(colors[p.id]) ? 'rgba(0,0,0,0.05)' : colors[p.id])
                   : 'transparent',
