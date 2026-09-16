@@ -17,7 +17,7 @@ export default function AboutPage() {
   }, [])
 
   return (
-    <div style={{ minHeight: '100dvh', background: '#fff', fontFamily: F, color: '#111', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ height: '100dvh', background: '#fff', fontFamily: F, color: '#111', display: 'flex', flexDirection: 'column' }}>
 
       {/* Nav */}
       <nav style={{
