@@ -3,6 +3,7 @@ import { createServiceClient } from '@/lib/supabase'
 import { isAuthenticated } from '@/lib/auth'
 
 export async function GET() {
+  // Public — no auth required, settings are public data
   const supabase = createServiceClient()
   const { data, error } = await supabase.from('settings').select('key, value')
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

@@ -1,32 +1,20 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { createClient } from '@supabase/supabase-js'
 
 const F = "'Helvetica Neue', Helvetica, Arial, sans-serif"
 const NAV_H = 56
 
-export const metadata = {
-  title: 'About — Konnerad',
-}
+export default function AboutPage() {
+  const [about, setAbout] = useState<string | null>(null)
 
-export const revalidate = 60
-
-async function getAbout(): Promise<string> {
-  try {
-    const supabase = createClient(
-      'https://ahqwlxprkgzouoxkpnuc.supabase.co',
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    )
-    const { data, error } = await supabase.from('settings').select('value').eq('key', 'about').single()
-    if (error) console.error('about fetch error:', error.message)
-    return data?.value ?? ''
-  } catch (e) {
-    console.error('about fetch exception:', e)
-    return ''
-  }
-}
-
-export default async function AboutPage() {
-  const about = await getAbout()
+  useEffect(() => {
+    fetch('/api/admin/settings')
+      .then(r => r.json())
+      .then(d => setAbout(d.about ?? ''))
+      .catch(() => setAbout(''))
+  }, [])
 
   return (
     <div style={{ minHeight: '100dvh', background: '#fff', fontFamily: F, color: '#111' }}>
