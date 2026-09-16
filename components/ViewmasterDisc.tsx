@@ -138,7 +138,7 @@ export default function ViewmasterDisc({
   }
 
   const viewerProject = projects[selected] ?? null
-  const viewerImg = viewerProject ? thumb(viewerProject.thumbnail || viewerProject.images?.[0] || '', 256) : null
+  const viewerImg = viewerProject ? (viewerProject.thumbnail || viewerProject.images?.[0] || null) : null
 
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', touchAction: 'manipulation' }}>
@@ -202,7 +202,7 @@ export default function ViewmasterDisc({
           {/* Frames */}
           {frames.map((f) => {
             const project = projects[f.idx] ?? null
-            const imgUrl = project ? thumb(project.thumbnail || project.images?.[0] || '', 128) : null
+            const imgUrl = project ? (project.thumbnail || project.images?.[0] || null) : null
             const isSelected = f.idx === selected
 
             return (

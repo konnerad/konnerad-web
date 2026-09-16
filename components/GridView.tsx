@@ -123,7 +123,7 @@ export default function GridView({
 
         {/* Rows */}
         {projects.map((p, i) => {
-          const img = thumb(p.thumbnail || p.images?.[0] || '', 128)
+          const img = p.thumbnail || p.images?.[0]
           const isHov = hoveredIdx === i
 
           return (
