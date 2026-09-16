@@ -12,6 +12,11 @@ const VIEWER_R = 118
 const F = "'Helvetica Neue', Helvetica, Arial, sans-serif"
 const DISC_COLOR = '#f6f5f1'
 
+function thumb(url: string, w = 128) {
+  if (!url || url.includes('youtube') || /\.(mp4|mov|webm)$/i.test(url)) return url
+  return `/_next/image?url=${encodeURIComponent(url)}&w=${w}&q=80`
+}
+
 const MIN_N = 14
 const MAX_N = 20
 // Base frame dimensions at N=14
@@ -133,7 +138,7 @@ export default function ViewmasterDisc({
   }
 
   const viewerProject = projects[selected] ?? null
-  const viewerImg = viewerProject ? (viewerProject.thumbnail || viewerProject.images?.[0]) : null
+  const viewerImg = viewerProject ? thumb(viewerProject.thumbnail || viewerProject.images?.[0] || '', 256) : null
 
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', touchAction: 'manipulation' }}>
@@ -197,7 +202,7 @@ export default function ViewmasterDisc({
           {/* Frames */}
           {frames.map((f) => {
             const project = projects[f.idx] ?? null
-            const imgUrl = project ? (project.thumbnail || project.images?.[0]) : null
+            const imgUrl = project ? thumb(project.thumbnail || project.images?.[0] || '', 128) : null
             const isSelected = f.idx === selected
 
             return (

@@ -4,6 +4,11 @@ import { useState, useEffect } from 'react'
 import { Project } from '@/lib/supabase'
 
 const F = "'Helvetica Neue', Helvetica, Arial, sans-serif"
+
+function thumb(url: string, w = 128) {
+  if (!url || url.includes('youtube') || /\.(mp4|mov|webm)$/i.test(url)) return url
+  return `/_next/image?url=${encodeURIComponent(url)}&w=${w}&q=80`
+}
 const BORDER = '0.5px solid rgba(0,0,0,0.12)'
 
 function extractColor(imgUrl: string, cb: (color: string) => void) {
@@ -63,7 +68,7 @@ export default function GridView({
   useEffect(() => {
     projects.forEach(p => {
       const img = p.thumbnail || p.images?.[0]
-      if (img && !colors[p.id]) {
+      if (img && !colors[p.id] && !img.includes('youtube')) {
         extractColor(img, color => setColors(prev => ({ ...prev, [p.id]: color })))
       }
     })
@@ -112,7 +117,7 @@ export default function GridView({
 
         {/* Rows */}
         {projects.map((p, i) => {
-          const img = p.thumbnail || p.images?.[0]
+          const img = thumb(p.thumbnail || p.images?.[0] || '', 128)
           const isHov = hoveredIdx === i
 
           return (
