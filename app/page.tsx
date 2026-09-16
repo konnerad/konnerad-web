@@ -49,7 +49,7 @@ export default function Home() {
         display: 'grid', gridTemplateColumns: '1fr auto 1fr',
         alignItems: 'center', padding: '0 32px',
       }}>
-        <Link href="/about" style={{ fontSize: 13, color: '#111', textDecoration: 'none' }}>
+        <Link href="/about" style={{ fontSize: 13, color: '#111', textDecoration: 'none' }} onMouseEnter={e => (e.currentTarget.style.opacity='0.4')} onMouseLeave={e => (e.currentTarget.style.opacity='1')}>
           about
         </Link>
         <button onClick={() => setView(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>

@@ -151,11 +151,11 @@ export default function GridView({
               }}
             >
               {/* Thumbnail */}
-              <div style={{ width: THUMB, height: THUMB, flexShrink: 0, overflow: 'hidden', background: '#fff' }}>
+              <div style={{ width: THUMB, height: THUMB, flexShrink: 0, overflow: 'hidden', background: p.disc_contain ? '#fff' : 'transparent' }}>
                 {img ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={img} alt={p.label} style={{
-                    width: '100%', height: '100%', objectFit: 'contain', display: 'block',
+                    width: '100%', height: '100%', objectFit: p.disc_contain ? 'contain' : 'cover', display: 'block',
                   }} />
                 ) : (
                   <div style={{ width: '100%', height: '100%', background: '#f0eeeb' }} />

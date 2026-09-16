@@ -145,7 +145,7 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
         display: 'grid', gridTemplateColumns: '1fr auto 1fr',
         alignItems: 'center', padding: `0 32px`,
       }}>
-        <Link href="/about" style={{ fontSize: 13, color: '#111', textDecoration: 'none' }}>
+        <Link href="/about" style={{ fontSize: 13, color: '#111', textDecoration: 'none', transition: 'opacity 0.15s' }} onMouseEnter={e => (e.currentTarget.style.opacity='0.4')} onMouseLeave={e => (e.currentTarget.style.opacity='1')}>
           about
         </Link>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
