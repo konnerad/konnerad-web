@@ -10,7 +10,7 @@ export default function AboutPage() {
   const [about, setAbout] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/admin/settings')
+    fetch('/api/about')
       .then(r => r.json())
       .then(d => setAbout(d.about ?? ''))
       .catch(() => setAbout(''))
