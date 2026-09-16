@@ -5,6 +5,12 @@ import { Project } from '@/lib/supabase'
 
 const F = "'Helvetica Neue', Helvetica, Arial, sans-serif"
 
+function isNearWhite(color: string) {
+  const m = color.match(/rgb\((\d+),(\d+),(\d+)\)/)
+  if (!m) return true
+  return +m[1] > 238 && +m[2] > 238 && +m[3] > 238
+}
+
 function thumb(url: string, w = 128) {
   if (!url || url.includes('youtube') || /\.(mp4|mov|webm)$/i.test(url)) return url
   return `/_next/image?url=${encodeURIComponent(url)}&w=${w}&q=80`
@@ -133,7 +139,9 @@ export default function GridView({
                 width: '100%',
                 padding: `${isMobile ? 12 : 16}px 0`,
                 borderBottom: BORDER,
-                background: isHov ? (colors[p.id] ?? 'rgba(0,0,0,0.025)') : 'transparent',
+                background: isHov
+                  ? (!colors[p.id] || isNearWhite(colors[p.id]) ? 'rgba(0,0,0,0.05)' : colors[p.id])
+                  : 'transparent',
                 cursor: 'pointer',
                 textAlign: 'left',
                 alignItems: 'center',
