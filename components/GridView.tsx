@@ -89,7 +89,7 @@ export default function GridView({
     : ['Image', 'Title', 'Kind', 'Client', 'Year']
 
   return (
-    <div className="absolute inset-0 overflow-y-auto" style={{ background: hoveredColor ?? '#ffffff', fontFamily: F, transition: 'background 0.35s ease' }}>
+    <div className="absolute inset-0 overflow-y-auto" style={{ background: '#ffffff', fontFamily: F }}>
       <div style={{ padding: PAD }}>
 
         {/* Header */}
@@ -128,7 +128,7 @@ export default function GridView({
                 width: '100%',
                 padding: `${isMobile ? 12 : 16}px 0`,
                 borderBottom: BORDER,
-                background: isHov ? 'rgba(0,0,0,0.06)' : 'transparent',
+                background: isHov ? (colors[p.id] ?? 'rgba(0,0,0,0.025)') : 'transparent',
                 cursor: 'pointer',
                 textAlign: 'left',
                 alignItems: 'center',
