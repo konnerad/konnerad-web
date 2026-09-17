@@ -54,7 +54,7 @@ export default function Home() {
         </Link>
         <button onClick={() => setView(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/apple-touch-icon.png" alt="Konnerad" style={{ width: 28, height: 28, display: 'block', borderRadius: 4 }} />
+          <img src="/logo.png" alt="Konnerad" style={{ width: 28, height: 28, display: 'block' }} />
         </button>
         <div />
       </nav>
