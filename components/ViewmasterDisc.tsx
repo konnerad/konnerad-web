@@ -75,7 +75,15 @@ export default function ViewmasterDisc({
         ? vibrantBuckets[0]
         : all.sort((a, b) => b.count - a.count)[0]
       if (!pick) return
-      setDiscColor(`rgb(${Math.round(pick.r / pick.count)},${Math.round(pick.g / pick.count)},${Math.round(pick.b / pick.count)})`)
+      let r = Math.round(pick.r / pick.count)
+      let g = Math.round(pick.g / pick.count)
+      let b = Math.round(pick.b / pick.count)
+      // If color is near-white, blend toward a visible light grey so disc doesn't disappear
+      if (r > 220 && g > 220 && b > 220) {
+        r = Math.round(r * 0.88 + 20); g = Math.round(g * 0.88 + 20); b = Math.round(b * 0.88 + 20)
+        r = Math.min(r, 210); g = Math.min(g, 210); b = Math.min(b, 210)
+      }
+      setDiscColor(`rgb(${r},${g},${b})`)
     }
     img.onerror = () => {}
     img.src = `/api/dominant-color?url=${encodeURIComponent(imgUrl)}`
@@ -140,6 +148,13 @@ export default function ViewmasterDisc({
         <defs>
           <filter id="vmGrain" x="-2%" y="-2%" width="104%" height="104%">
             <feTurbulence type="fractalNoise" baseFrequency="0.60 0.65" numOctaves="4" seed="5" result="noise" />
+            <feColorMatrix in="noise" type="saturate" values="0" result="grayNoise" />
+            <feBlend in="SourceGraphic" in2="grayNoise" mode="soft-light" result="blended" />
+            <feComposite in="blended" in2="SourceGraphic" operator="in" />
+          </filter>
+          {/* Lightweight static grain for mobile — 1 octave, applied to non-rotating overlay */}
+          <filter id="vmGrainMobile" x="-2%" y="-2%" width="104%" height="104%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="1" seed="5" result="noise" />
             <feColorMatrix in="noise" type="saturate" values="0" result="grayNoise" />
             <feBlend in="SourceGraphic" in2="grayNoise" mode="soft-light" result="blended" />
             <feComposite in="blended" in2="SourceGraphic" operator="in" />
@@ -254,6 +269,13 @@ export default function ViewmasterDisc({
             </text>
           </g>
         </g>
+
+        {/* Static grain overlay for mobile — sits on top of disc but doesn't rotate */}
+        {isMobile && (
+          <circle cx={CX} cy={CY} r={DISC_R} fill="transparent"
+            filter="url(#vmGrainMobile)" mask="url(#discMask)"
+            style={{ pointerEvents: 'none' }} />
+        )}
 
         {/* Fixed center viewer */}
         <g
