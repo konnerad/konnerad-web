@@ -136,6 +136,15 @@ export default function ViewmasterDisc({
     spinTimer.current = setTimeout(() => setShadowLifted(false), 300)
   }
 
+  // Pick text color (black or white) based on disc luminance
+  const discTextColor = (() => {
+    const m = discColor.match(/rgb\((\d+),(\d+),(\d+)\)/)
+    if (!m) return '#111'
+    const [r, g, b] = [+m[1], +m[2], +m[3]]
+    const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+    return lum > 0.5 ? '#111111' : '#ffffff'
+  })()
+
   const viewerProject = projects[selected] ?? null
   const viewerImg = viewerProject ? (viewerProject.thumbnail || viewerProject.images?.[0] || null) : null
 
@@ -264,7 +273,7 @@ export default function ViewmasterDisc({
           {/* Label */}
           <g transform={`translate(${CX},${CY - 178})`}>
             <text x="0" y="0" textAnchor="middle"
-              fontFamily={F} fontWeight="500" fontSize="10" letterSpacing="1.5" fill="#9a9690">
+              fontFamily={F} fontWeight="500" fontSize="10" letterSpacing="1.5" fill={discTextColor} style={{ transition: 'fill 0.65s ease' }}>
               PROJECTS
             </text>
           </g>
@@ -309,7 +318,8 @@ export default function ViewmasterDisc({
               fontSize="20"
               fontWeight="300"
               letterSpacing="0.06em"
-              fill="#333"
+              fill={discTextColor}
+              style={{ transition: 'fill 0.65s ease' }}
             >
               {viewerProject.disc_label || viewerProject.label}
             </text>
