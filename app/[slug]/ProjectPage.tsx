@@ -162,7 +162,15 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
         padding: `0 ${SIDE}`,
       }}>
         {/* Image area — takes all space above the counter */}
-        <div style={{ flex: 1, position: 'relative', overflow: 'hidden', minHeight: 0 }}>
+        <div
+          style={{ flex: 1, position: 'relative', overflow: 'hidden', minHeight: 0 }}
+          onTouchStart={e => { (e.currentTarget as HTMLDivElement).dataset.tx = String(e.touches[0].clientX) }}
+          onTouchEnd={e => {
+            const startX = Number((e.currentTarget as HTMLDivElement).dataset.tx ?? 0)
+            const dx = e.changedTouches[0].clientX - startX
+            if (Math.abs(dx) > 40) { if (dx < 0) next(); else prev() }
+          }}
+        >
           {images.length > 0 ? (() => {
             const url = images[imgIndex]
             const ytId = youtubeId(url)
@@ -180,6 +188,7 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
                 key={imgIndex}
                 src={url}
                 controls
+                playsInline
                 style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }}
               />
             )
