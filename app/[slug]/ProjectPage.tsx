@@ -150,7 +150,7 @@ function ProjectDetail({ project, refNum }: { project: Project; refNum: string }
         </Link>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/apple-touch-icon.png" alt="Konnerad" style={{ width: 28, height: 28, display: 'block', borderRadius: 4 }} />
+          <img src="/logo.png" alt="Konnerad" style={{ width: 28, height: 28, display: 'block' }} />
         </Link>
         <div />
       </nav>
